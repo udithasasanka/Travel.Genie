@@ -1,6 +1,6 @@
 FROM maven:3.8.5-openjdk-17 AS build
 COPY . .
-RUN mvn clean package -DskipTests
+RUN mvn -f TravelApp/pom.xml clean package -DskipTests
 
 FROM eclipse-temurin:17-jre
 COPY --from=build /target/*.jar app.jar
