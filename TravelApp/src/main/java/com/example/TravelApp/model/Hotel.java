@@ -1,4 +1,4 @@
-package com.example.TravelApp.controller;
+package com.example.TravelApp.model;
 
 import jakarta.persistence.*;
 
