@@ -27,7 +27,7 @@
         #chat-circle {
             position: fixed;
             bottom: 25px;
-            right: 120px;
+            right: 20px; /* ලස්සනට දකුණු පැත්තට සෙට් වෙන්න හැදුවා */
             background: #007bff;
             color: white;
             width: 60px;
@@ -137,7 +137,6 @@
             const chatBox = document.getElementById("chat-box");
             chatBox.style.display = chatBox.style.display === "none" ? "flex" : "none";
 
-            // 💡 Chat එක මුලින්ම open කරද්දී friendly, welcoming message එකක් දෙනවා
             const chatLogs = document.getElementById("chat-logs");
             if (chatLogs.innerHTML === "") {
                 appendAIMessage("Hey brother! Welcome to Ceylon Reverie. 🌴 Ask me anything about Sri Lanka, or tell me where you wanna go, how many days, and your budget to cook up a sick itinerary!");
@@ -166,15 +165,11 @@
 
             let cleanMsg = message.toLowerCase();
 
-            // 🚨 PROFANITY & ABUSE FILTER (කුණුහරුප බැනුම් ආවොත් friendly handle කිරීම)
             if (cleanMsg.includes('fuck') || cleanMsg.includes('bitch') || cleanMsg.includes('huthth') || cleanMsg.includes('paki') || cleanMsg.includes('pako')) {
                 appendAIMessage("Ado machn, let's keep it clean and friendly! Tell me how I can help you with your trip.");
                 return;
             }
 
-            // 💡 🚀 අර පරණ rigid state machine එක සම්පූර්ණයෙන්ම අයින් කරලා,
-            // කෙලින්ම user ලියන දේ destination එක විදිහට Java backend එකට pass කරනවා.
-            // එතකොට AI එකෙන් මුළු message එකම කියවලා dynamic උත්තරයක් එවනවා.
             let payload = {
                 destination: message,
                 companionType: 'Friends',
@@ -183,20 +178,19 @@
                 budget: 'Medium'
             };
 
-            // AI එක හිතනකම් ලස්සනට Loading (Thinking...) message එකක් පෙන්නනවා
             const chatLogs = document.getElementById("chat-logs");
             let loadingId = "loading-" + Date.now();
             chatLogs.innerHTML += `<div id="${loadingId}" class="ai-msg"><b>AI:</b> Thinking... 🤔</div>`;
             chatLogs.scrollTop = chatLogs.scrollHeight;
 
-            fetch('http://localhost:8080/api/chatbot/generate-itinerary', {
+            // 🌐 FIXED: Localhost වෙනුවට ඔයාගේ ලයිව් Render URL එක දැම්මා!
+            fetch('https://travel-genie-wokv.onrender.com/api/chatbot/generate-itinerary', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             })
                 .then(response => response.text())
                 .then(data => {
-                    // Loading එක අයින් කරලා AI එවපු උත්තරය print කරනවා
                     document.getElementById(loadingId).remove();
                     appendAIMessage(data);
                 })
