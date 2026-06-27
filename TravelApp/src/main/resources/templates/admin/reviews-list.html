@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <style>
+        .admin-nav {
+            background-color: #343a40;
+            color: white;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 30px;
+        }
+        .admin-nav a {
+            color: white;
+            text-decoration: none;
+            margin-right: 20px;
+            padding: 8px 12px;
+            display: inline-block;
+            border-radius: 4px;
+        }
+        .admin-nav a:hover {
+            background-color: #495057;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f5f5f5;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #ddd;
+        }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 12px;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        .rating {
+            color: #ff9800;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<header class="site-header">
+    <div class="container header-inner">
+        <h1><a th:href="@{/}">TravelApp</a></h1>
+        <nav>
+            <a th:href="@{/}">Home</a>
+            <a th:href="@{/admin}">Dashboard</a>
+            <a th:href="@{/logout}">Logout</a>
+        </nav>
+    </div>
+</header>
+
+<main class="container">
+    <h1>Review Management</h1>
+    
+    <div class="admin-nav">
+        <a th:href="@{/admin}">Dashboard</a>
+        <a th:href="@{/admin/users}">Users</a>
+        <a th:href="@{/admin/destinations}">Destinations</a>
+        <a th:href="@{/admin/packages}">Packages</a>
+        <a th:href="@{/admin/bookings}">Bookings</a>
+        <a th:href="@{/admin/reviews}">Reviews</a>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>User</th>
+                <th>Package</th>
+                <th>Rating</th>
+                <th>Comment</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="review : ${reviews}">
+                <td th:text="${review.id}"></td>
+                <td th:text="${review.user.name}"></td>
+                <td th:text="${review.tourPackage.name}"></td>
+                <td>
+                    <span class="rating" th:text="${review.rating}"></span>
+                    <span> / 5</span>
+                </td>
+                <td th:text="${review.comment}"></td>
+                <td>
+                    <form th:action="@{/admin/reviews/delete/{id}(id=${review.id})}" method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</main>
+
+<footer class="site-footer">
+    <div class="container">
+        <p>© 2026 TravelApp Admin Panel. All Rights Reserved.</p>
+    </div>
+</footer>
+</body>
+</html>

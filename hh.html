@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CEYLON REVERIE | Premium Expedition Planner</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="luxury-grid">
+        <!-- Interactive Control Panel Sidebar -->
+        <aside class="sidebar">
+            <div class="brand-block">
+                <h2>CEYLON REVERIE</h2>
+                <p>Advanced Island Architect</p>
+            </div>
+            
+            <hr class="separator">
+
+            <div class="filter-group">
+                <label class="section-title">Select Travel Mindset</label>
+                <div class="custom-selector-container">
+                    <select id="categorySelector">
+                        <option value="All">🌌 Explore Everything</option>
+                        <option value="Heritage">🏛️ Heritage & Citadels</option>
+                        <option value="Wildlife">🐆 Wilderness & Savannas</option>
+                        <option value="Alpine">🌿 Alpine Highlands</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label class="section-title">Expedition Variables</label>
+                <div class="slider-wrapper">
+                    <span class="slider-label">Travelers: <strong id="passengerCountDisplay">2</strong></span>
+                    <input type="range" id="passengerSlider" min="1" max="10" value="2">
+                </div>
+            </div>
+
+            <div class="pricing-ledger">
+                <h4>Estimated Cost Matrix</h4>
+                <div class="ledger-row"><span>Base Fees:</span> <span id="ledgerBase">$0.00</span></div>
+                <div class="ledger-row"><span>Experiences:</span> <span id="ledgerExp">$0.00</span></div>
+                <hr>
+                <div class="ledger-row total"><span>Total Gross Cost:</span> <span id="ledgerTotal">$0.00</span></div>
+            </div>
+        </aside>
+
+        <!-- Main Interactive Content Showcase -->
+        <main class="main-display">
+            <header class="display-header">
+                <div class="header-text">
+                    <h1>Curated Expeditions</h1>
+                    <p>Select paths and experiences to dynamically build your customized Sri Lankan itinerary.</p>
+                </div>
+                <div class="status-badge live">System Active</div>
+            </header>
+
+            <!-- Card Render Target Area -->
+            <section id="cardContainer" class="card-grid">
+                <!-- System injects enterprise content elements directly here -->
+            </section>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

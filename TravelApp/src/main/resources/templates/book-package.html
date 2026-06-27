@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <title>Book Package - TravelApp</title>
+    <style>
+        .booking-container {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 40px;
+            margin-top: 30px;
+            align-items: start;
+        }
+        .package-info-side {
+            background: transparent;
+        }
+        .package-badge-row {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .p-badge {
+            background-color: #e6f4f1;
+            color: #0f766e;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .p-description {
+            font-size: 16px;
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .info-item h4 {
+            margin: 0 0 5px 0;
+            color: #666;
+            font-size: 14px;
+        }
+        .info-item p {
+            margin: 0;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        .section-sub-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #444;
+            margin-top: 25px;
+            margin-bottom: 10px;
+        }
+
+        /* 💳 Summary Card Layout */
+        .summary-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+        }
+        .summary-header {
+            background-color: #f1f5f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .summary-header h3 {
+            margin: 0 0 10px 0;
+            font-size: 15px;
+            color: #475569;
+        }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .summary-row .label { color: #64748b; }
+        .summary-row .val { font-weight: bold; color: #1e293b; }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 14px;
+            box-sizing: border-box;
+            background-color: #fff;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #0f766e;
+            box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.1);
+        }
+        .flex-inputs {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 15px;
+        }
+
+        /* 🏨 🎯 Dynamic Options Container Style */
+        #hotelOptionsContainer {
+            background-color: #f8fafc;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px dashed #0f766e;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .btn-confirm {
+            width: 100%;
+            background-color: #0f766e;
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 10px;
+        }
+        .btn-confirm:hover {
+            background-color: #0d615a;
+        }
+
+        @media (max-width: 768px) {
+            .booking-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<header class="site-header">
+    <div class="container header-inner">
+        <h1><a th:href="@{/}">TravelApp</a></h1>
+        <nav>
+            <a th:href="@{/}">Home</a>
+            <a th:href="@{/destinations}">Destinations</a>
+            <a th:href="@{/packages}">Packages</a>
+            <a th:href="@{/about}">About</a>
+            <a th:href="@{/contact}">Contact</a>
+            <a th:href="@{/admin}">Admin</a>
+        </nav>
+    </div>
+</header>
+
+<main class="container">
+    <section class="page-heading" style="margin-bottom: 10px;">
+        <h2>Book Package</h2>
+        <p style="color: #64748b; margin: 5px 0 0 0;">Complete your booking with a clean, secure checkout experience.</p>
+    </section>
+
+    <div th:if="${error}" style="margin: 15px 0; color:#b00020; font-weight:700;">
+        <p th:text="${error}"></p>
+    </div>
+
+    <div class="booking-container">
+
+        <div class="package-info-side">
+            <span style="color: #f97316; font-weight: bold; font-size: 14px; text-transform: uppercase;" th:text="${package.category}">BEACH</span>
+            <h1 style="margin: 10px 0; font-size: 32px; color: #1e293b;" th:text="${package.name}">Mirissa Whale Watching</h1>
+
+            <div class="package-badge-row">
+                <span class="p-badge" th:text="${package.category}">Mirissa Beach</span>
+                <span class="p-badge" th:text="${package.rating + ' ★'}">4.7 ★</span>
+                <span class="p-badge" th:text="${package.maxTravelers + ' travelers'}">12 travelers</span>
+            </div>
+
+            <p class="p-description" th:text="${package.description}">4-day exciting beach vacation with a whale watching cruise.</p>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <h4>Price per traveler</h4>
+                    <p>LKR <span th:text="${package.price}"></span></p>
+                </div>
+                <div class="info-item">
+                    <h4>Destination</h4>
+                    <p th:text="${package.destination.name}">Sri Lanka</p>
+                </div>
+            </div>
+
+            <div class="section-sub-title">Booking available</div>
+            <p style="margin: 0; color: #475569;" th:text="${package.destination.name}">Mirissa Beach</p>
+
+            <div class="section-sub-title">What's included</div>
+            <p style="margin: 0; color: #475569; white-space: pre-line;" th:text="${package.includes != null ? package.includes : 'Accommodation, transport, meals, guided tours'}"></p>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-header">
+                <h3>Booking summary</h3>
+                <div class="summary-row">
+                    <span class="label">Package</span>
+                    <span class="val" th:text="${package.name}">Mirissa Whale Watching</span>
+                </div>
+                <div class="summary-row">
+                    <span class="label">Price</span>
+                    <span class="val">LKR <span th:text="${package.price}"></span></span>
+                </div>
+            </div>
+
+            <form th:action="@{/book}" method="post" onsubmit="return validateBookingForm()">
+                <input type="hidden" name="packageId" th:value="${package.id}"/>
+
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="userEmail" required placeholder="you@example.com"/>
+                </div>
+
+                <div class="flex-inputs">
+                    <div class="form-group">
+                        <label>Travel Date</label>
+                        <input type="date" name="travelDate" required/>
+                    </div>
+                    <div class="form-group">
+                        <label>Travelers</label>
+                        <input type="number" name="travelers" id="travelersInput" min="1" max="10" value="1" oninput="calculateTotalPrice()" required/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="hotelId">Select Hotel Option</label>
+                    <select id="hotelId" name="hotelId" onchange="toggleHotelOptions(); calculateTotalPrice();">
+                        <option value="" th:data-extra="0">No Hotel (Standard Option - LKR 0.00)</option>
+                        <option th:each="hotel : ${package.hotels}"
+                                th:value="${hotel.id}"
+                                th:data-extra="${hotel.extraPrice}"
+                                th:text="${hotel.name} + ' (+ LKR ' + ${hotel.extraPrice} + ' / Day)'">
+                        </option>
+                    </select>
+                </div>
+
+                <div id="hotelOptionsContainer" style="display: none;">
+
+                    <div class="form-group">
+                        <label for="hotelNights" style="color: #0f766e;">How many Days will you stay?</label>
+                        <input type="number" id="hotelNights" name="hotelNights" min="1" max="30" value="1" oninput="calculateTotalPrice()" placeholder="Number of Days"/>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="foodType" style="color: #0f766e;">Select Food Type</label>
+                        <select id="foodType" name="foodType" onchange="calculateTotalPrice()">
+                            <option value="local" data-price="500.00">Local Foods (+ LKR 500.00 / Day)</option>
+                            <option value="western" data-price="1500.00">Western Foods (+ LKR 1,500.00 / Day)</option>
+                            <option value="asian" data-price="1000.00">Asian Foods (+ LKR 1,000.00 / Day)</option>
+                            <option value="indian" data-price="800.00">Indian Foods (+ LKR 800.00 / Day)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="transportMode" style="color: #0f766e;">Only Giving Vehicle</label>
+                        <select id="transportMode" name="transportMode" onchange="calculateTotalPrice()">
+                            <option value="bike" data-price="1000.00">Bike (+ LKR 1,000.00 / Day)</option>
+                            <option value="threewheel" data-price="1500.00">Three-Wheel (+ LKR 1,500.00 / Day)</option>
+                            <option value="car" data-price="3500.00">Car (+ LKR 3,500.00 / Day)</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <div style="background-color: #f8fafc; padding: 16px; border-radius: 8px; margin: 20px 0; border: 1px solid #e2e8f0; text-align: center;">
+                    <p style="margin: 0; font-size: 15px; font-weight: 600; color: #475569;">
+                        Estimated Total Price
+                    </p>
+                    <p style="margin: 5px 0 0 0; color: #0f766e; font-size: 26px; font-weight: 800;">
+                        LKR <span id="totalPriceDisplay" th:text="${package.price}"></span>
+                    </p>
+                </div>
+
+                <button type="submit" class="btn-confirm">Confirm Booking</button>
+            </form>
+        </div>
+
+    </div>
+</main>
+
+<footer class="site-footer" style="margin-top: 60px;">
+    <div class="container">
+        <p>© 2026 TravelApp. All Rights Reserved.</p>
+    </div>
+</footer>
+
+<script th:inline="javascript">
+    // 🎯 හෝටලයක් සිලෙක්ට් කරලා තියෙනවා නම් විතරක් අමතර Options පෙන්වන Function එක
+    function toggleHotelOptions() {
+        const hotelSelect = document.getElementById("hotelId");
+        const optionsContainer = document.getElementById("hotelOptionsContainer");
+        const nightsInput = document.getElementById("hotelNights");
+
+        if (hotelSelect.value !== "") {
+            optionsContainer.style.display = "block"; // හෝටලයක් තෝරලා නම් සේරම පෙන්වන්න
+            if(nightsInput.value === "" || nightsInput.value < 1) {
+                nightsInput.value = 1; // Default 1 Day සෙට් කරනවා
+            }
+        } else {
+            optionsContainer.style.display = "none"; // No Hotel නම් ඔක්කොම හංගන්න
+            nightsInput.value = 0;
+        }
+    }
+
+    // 🎯 Live Price Calculator (Days + Foods + Transport සේරම එකතු කරලා ගාණ හදනවා)
+    function calculateTotalPrice() {
+        const basePrice = /*[[${package.price}]]*/ 0;
+        const travelersCount = parseInt(document.getElementById("travelersInput").value) || 1;
+        const hotelSelect = document.getElementById("hotelId");
+
+        let totalPrice = basePrice * travelersCount;
+
+        if (hotelSelect.value !== "") {
+            const selectedOption = hotelSelect.options[hotelSelect.selectedIndex];
+            const extraPricePerNight = parseFloat(selectedOption.getAttribute("data-extra")) || 0;
+            const nightsCount = parseInt(document.getElementById("hotelNights").value) || 0;
+
+            // கෑම මිල ගැනීම
+            const foodSelect = document.getElementById("foodType");
+            const foodPrice = parseFloat(foodSelect.options[foodSelect.selectedIndex].getAttribute("data-price")) || 0;
+
+            // වාහන මිල ගැනීම
+            const transSelect = document.getElementById("transportMode");
+            const transPrice = parseFloat(transSelect.options[transSelect.selectedIndex].getAttribute("data-price")) || 0;
+
+            // 💸 අලුත් සූත්‍රය = (මූලික මිල * සෙනඟ) + [(හෝටල් මිල + කෑම මිල + වාහන මිල) * සෙනඟ * දවස් ගණන]
+            const extraCost = (extraPricePerNight + foodPrice + transPrice) * travelersCount * nightsCount;
+            totalPrice += extraCost;
+        }
+
+        document.getElementById("totalPriceDisplay").innerText = totalPrice.toFixed(2);
+    }
+
+    function validateBookingForm() {
+        const travelers = document.getElementById("travelersInput").value;
+        const travelDate = document.querySelector('[name="travelDate"]').value;
+        if (!travelDate || new Date(travelDate) < new Date()) {
+            alert('Please select a valid travel date.');
+            return false;
+        }
+        if (travelers < 1) {
+            alert('Please select at least one traveler.');
+            return false;
+        }
+        return true;
+    }
+
+    window.onload = function() {
+        toggleHotelOptions();
+        calculateTotalPrice();
+    };
+</script>
+</body>
+</html>

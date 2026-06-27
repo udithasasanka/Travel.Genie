@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<header class="site-header">
+    <div class="container header-inner">
+        <h1><a th:href="@{/}">TravelApp</a></h1>
+        <nav>
+            <a th:href="@{/}">Home</a>
+            <a th:href="@{/destinations}">Destinations</a>
+            <a th:href="@{/packages}">Packages</a>
+            <a th:href="@{/about}">About</a>
+            <a th:href="@{/contact}">Contact</a>
+            <a th:href="@{/admin}">Admin</a>
+        </nav>
+    </div>
+</header>
+<main class="container">
+    <section class="page-heading">
+        <h2>About TravelApp</h2>
+        <p>TravelApp is a modern tour booking website with package browsing, booking history, and admin tools for managing destinations, packages, and reviews.</p>
+    </section>
+    <section class="content-card">
+        <h3>Why choose us?</h3>
+        <ul>
+            <li>Easy booking and travel management</li>
+            <li>Personalized package selection</li>
+            <li>Ratings and reviews from real customers</li>
+        </ul>
+    </section>
+</main>
+<footer class="site-footer">
+    <div class="container">
+        <p>© 2026 TravelApp. All Rights Reserved.</p>
+    </div>
+    <div th:replace="fragments :: chatbot"></div>
+</footer>
+</body>
+</html>
