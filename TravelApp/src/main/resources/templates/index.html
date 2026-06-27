@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TravelApp — Sri Lanka Adventures</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}">
+    
+    <style>
+        .need-help, #need-help, .needhelp-btn, [class*="need-help"] {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+        }
+    </style>
+
     <script>
         function onSearch() {
             const q = document.getElementById('q').value.trim();
@@ -34,7 +43,6 @@
 </header>
 <main>
 
-    <!-- Center කරපු අලුත් Hero Section එක -->
     <section class="hero" style="position: relative; overflow: hidden; background: none !important; color: #ffffff; min-height: 85vh; display: flex; align-items: center; justify-content: center; text-align: center; padding: 80px 20px;">
 
         <video autoplay muted loop playsinline style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0;">
@@ -150,9 +158,8 @@
         <p>© 2026 Travel Genie. Crafted for Sri Lanka explorers.</p>
     </div>
 </footer>
-    <div th:replace="~{fragments :: chatbot}"></div>
 
-
+<div th:replace="~{fragments :: chatbot}"></div>
 
 </body>
 </html>
