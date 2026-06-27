@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link th:href="@{/css/styles.css}" rel="stylesheet">
+</head>
+<body>
+<div th:fragment="chatbot">
+    <!-- Floating AI Chat Widget Elements -->
+    <div id="chat-circle" onclick="toggleChat()">AI</div>
+
+    <div id="chat-box" style="display: none;">
+        <!-- Close button එක සහිත Header එක -->
+        <div id="chat-header">
+            <span>Travel AI Assistant</span>
+            <span id="chat-close" onclick="toggleChat()">✕</span>
+        </div>
+        <div id="chat-logs" style="display: flex; flex-direction: column;"></div>
+        <div id="chat-input-container">
+            <input type="text" id="chat-input" placeholder="Ask about your trip or just say hi..." onkeypress="if(event.key === 'Enter') sendChatMessage()"/>
+            <button onclick="sendChatMessage()">Send</button>
+        </div>
+    </div>
+
+    <style>
+        #chat-circle {
+            position: fixed;
+            bottom: 25px;
+            right: 120px;
+            background: #007bff;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 60px;
+            cursor: pointer;
+            box-shadow: 0px 4px 15px rgba(0,0,0,0.4);
+            font-weight: bold;
+            z-index: 999999;
+            font-family: Arial, sans-serif;
+            transition: transform 0.2s ease;
+        }
+        #chat-circle:hover {
+            transform: scale(1.05);
+        }
+        #chat-box {
+            position: fixed;
+            bottom: 95px;
+            right: 20px;
+            width: 340px;
+            height: 450px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0px 5px 25px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            z-index: 999999;
+            font-family: Arial, sans-serif;
+            border: 1px solid #ddd;
+            overflow: hidden;
+        }
+        #chat-header {
+            background: #007bff;
+            color: white;
+            padding: 15px;
+            font-weight: bold;
+            font-size: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #chat-close {
+            cursor: pointer;
+            font-size: 18px;
+            padding: 0 5px;
+            transition: color 0.2s ease;
+        }
+        #chat-close:hover {
+            color: #ff4d4d;
+        }
+        #chat-logs {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background: #f9f9f9;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #333;
+        }
+        #chat-logs div {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            max-width: 85%;
+        }
+        .user-msg {
+            background: #e1f5fe;
+            align-self: flex-end;
+            margin-left: auto;
+            text-align: right;
+        }
+        .ai-msg {
+            background: #ffffff;
+            border: 1px solid #eee;
+            align-self: flex-start;
+            white-space: pre-line;
+        }
+        #chat-input-container {
+            display: flex;
+            padding: 10px;
+            background: white;
+            border-top: 1px solid #eee;
+        }
+        #chat-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            outline: none;
+        }
+        #chat-input-container button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 0 15px;
+            margin-left: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+
+    <script>
+        function toggleChat() {
+            const chatBox = document.getElementById("chat-box");
+            chatBox.style.display = chatBox.style.display === "none" ? "flex" : "none";
+
+            // 💡 Chat එක මුලින්ම open කරද්දී friendly, welcoming message එකක් දෙනවා
+            const chatLogs = document.getElementById("chat-logs");
+            if (chatLogs.innerHTML === "") {
+                appendAIMessage("Hey brother! Welcome to Ceylon Reverie. 🌴 Ask me anything about Sri Lanka, or tell me where you wanna go, how many days, and your budget to cook up a sick itinerary!");
+            }
+        }
+
+        function appendUserMessage(msg) {
+            const chatLogs = document.getElementById("chat-logs");
+            chatLogs.innerHTML += `<div class="user-msg"><b>You:</b> ${msg}</div>`;
+            chatLogs.scrollTop = chatLogs.scrollHeight;
+        }
+
+        function appendAIMessage(msg) {
+            const chatLogs = document.getElementById("chat-logs");
+            chatLogs.innerHTML += `<div class="ai-msg"><b>AI:</b> ${msg}</div>`;
+            chatLogs.scrollTop = chatLogs.scrollHeight;
+        }
+
+        function sendChatMessage() {
+            const inputField = document.getElementById("chat-input");
+            const message = inputField.value.trim();
+            if (!message) return;
+
+            appendUserMessage(message);
+            inputField.value = "";
+
+            let cleanMsg = message.toLowerCase();
+
+            // 🚨 PROFANITY & ABUSE FILTER (කුණුහරුප බැනුම් ආවොත් friendly handle කිරීම)
+            if (cleanMsg.includes('fuck') || cleanMsg.includes('bitch') || cleanMsg.includes('huthth') || cleanMsg.includes('paki') || cleanMsg.includes('pako')) {
+                appendAIMessage("Ado machn, let's keep it clean and friendly! Tell me how I can help you with your trip.");
+                return;
+            }
+
+            // 💡 🚀 අර පරණ rigid state machine එක සම්පූර්ණයෙන්ම අයින් කරලා,
+            // කෙලින්ම user ලියන දේ destination එක විදිහට Java backend එකට pass කරනවා.
+            // එතකොට AI එකෙන් මුළු message එකම කියවලා dynamic උත්තරයක් එවනවා.
+            let payload = {
+                destination: message,
+                companionType: 'Friends',
+                season: 'Dry Season',
+                durationDays: 4,
+                budget: 'Medium'
+            };
+
+            // AI එක හිතනකම් ලස්සනට Loading (Thinking...) message එකක් පෙන්නනවා
+            const chatLogs = document.getElementById("chat-logs");
+            let loadingId = "loading-" + Date.now();
+            chatLogs.innerHTML += `<div id="${loadingId}" class="ai-msg"><b>AI:</b> Thinking... 🤔</div>`;
+            chatLogs.scrollTop = chatLogs.scrollHeight;
+
+            fetch('http://localhost:8080/api/chatbot/generate-itinerary', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+                .then(response => response.text())
+                .then(data => {
+                    // Loading එක අයින් කරලා AI එවපු උත්තරය print කරනවා
+                    document.getElementById(loadingId).remove();
+                    appendAIMessage(data);
+                })
+                .catch(error => {
+                    document.getElementById(loadingId).remove();
+                    appendAIMessage("An unexpected operational network error occurred. Kindly ensure your Spring Boot server infrastructure is active.");
+                });
+        }
+    </script>
+</div>
+</body>
+</html>
