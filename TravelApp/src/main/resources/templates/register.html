@@ -4,71 +4,146 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
+        :root {
+            --primary-color: #0f766e; /* Admin Dashboard Emerald Green */
+            --primary-hover: #0d9488;
+            --bg-color: #f8fafc;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --card-shadow: 0 10px 30px rgba(15, 118, 110, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        main.container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        /* Minimalist Light Registration Card */
         .auth-container {
-            max-width: 500px;
-            margin: 50px auto;
-            padding: 30px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            background: #ffffff;
+            width: 100%;
+            max-width: 460px; /* Fields 4ක් තියෙන නිසා ඩිසයින් එක ලස්සනට පෙනෙන්න width එක තරමක් වැඩි කළා */
+            padding: 40px 35px;
+            border: 1px solid #e2e8f0;
+            border-radius: 24px;
+            box-shadow: var(--card-shadow);
+            box-sizing: border-box;
         }
+
         .auth-container h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
             text-align: center;
-            margin-bottom: 30px;
+            margin-top: 0;
+            margin-bottom: 25px;
         }
+
+        /* Form Styling */
         .form-group {
             margin-bottom: 20px;
         }
+
         .form-group label {
             display: block;
-            margin-bottom: 5px;
+            font-size: 0.9rem;
             font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--primary-color);
         }
+
         .form-group input {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            padding: 14px 16px;
+            background: #eff6ff; /* Soft Blue/Gray Tint input boxes */
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            font-family: inherit;
             font-size: 14px;
+            color: var(--text-dark);
+            transition: all 0.2s ease;
             box-sizing: border-box;
         }
+
         .form-group input:focus {
             outline: none;
-            border-color: #28a745;
-            box-shadow: 0 0 5px rgba(40,167,69,0.3);
+            border-color: var(--primary-color);
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.1);
         }
+
+        /* Theme Matching Emerald Button */
         .btn-register {
             width: 100%;
-            padding: 12px;
-            background-color: #28a745;
+            padding: 14px;
+            background-color: var(--primary-color);
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 12px;
+            font-family: inherit;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 10px;
+            box-shadow: 0 4px 12px rgba(15, 118, 110, 0.15);
         }
+
         .btn-register:hover {
-            background-color: #218838;
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(15, 118, 110, 0.25);
         }
+
+        .btn-register:active {
+            transform: translateY(0);
+        }
+
+        /* Bottom Link Styling */
         .auth-link {
             text-align: center;
             margin-top: 20px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
         }
+
         .auth-link a {
-            color: #007bff;
+            color: #f59e0b; /* Orange/Yellow Link Color to match the login theme */
             text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s ease;
         }
+
         .auth-link a:hover {
+            color: #d97706;
             text-decoration: underline;
         }
+
+        /* Error Notification */
         .error {
-            background-color: #f8d7da;
-            color: #721c24;
-            padding: 12px;
-            border-radius: 4px;
+            background-color: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+            padding: 12px 16px;
+            border-radius: 12px;
             margin-bottom: 20px;
+            font-size: 14px;
+            font-weight: 500;
         }
     </style>
 </head>
@@ -92,19 +167,19 @@
 
         <form method="post" th:action="@{/register}">
             <div class="form-group">
-                <label for="name">Full Name</label>
+                <label th:for="name">Full Name</label>
                 <input type="text" id="name" name="name" required placeholder="Your full name"/>
             </div>
             <div class="form-group">
-                <label for="email">Email</label>
+                <label th:for="email">Email</label>
                 <input type="email" id="email" name="email" required placeholder="your@email.com"/>
             </div>
             <div class="form-group">
-                <label for="phone">Phone</label>
+                <label th:for="phone">Phone</label>
                 <input type="tel" id="phone" name="phone" placeholder="Your phone number"/>
             </div>
             <div class="form-group">
-                <label for="password">Password</label>
+                <label th:for="password">Password</label>
                 <input type="password" id="password" name="password" required placeholder="Enter password"/>
             </div>
             <button type="submit" class="btn-register">Register</button>
