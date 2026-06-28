@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CEYLON REVERIE | Premium Expedition Planner</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div class="luxury-grid">
-        <!-- Interactive Control Panel Sidebar -->
         <aside class="sidebar">
             <div class="brand-block">
                 <h2>CEYLON REVERIE</h2>
@@ -47,7 +47,6 @@
             </div>
         </aside>
 
-        <!-- Main Interactive Content Showcase -->
         <main class="main-display">
             <header class="display-header">
                 <div class="header-text">
@@ -57,12 +56,58 @@
                 <div class="status-badge live">System Active</div>
             </header>
 
-            <!-- Card Render Target Area -->
             <section id="cardContainer" class="card-grid">
-                <!-- System injects enterprise content elements directly here -->
             </section>
         </main>
     </div>
+
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <div class="chat-bot-identity">
+                <i class="fas fa-robot"></i>
+                <div>
+                    <h4>Ceylon Genie</h4>
+                    <span class="chat-status">AI Expedition Guide</span>
+                </div>
+            </div>
+            <button class="chat-close-btn" id="closeChatBtn">&times;</button>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot-msg">
+                Greetings from Ceylon Reverie! I am your Premium Expedition Planner. How may I assist you today?
+            </div>
+        </div>
+        
+        <div class="chat-footer">
+            <input type="text" id="chatInput" placeholder="Ask about destinations, duration, budget..." autocomplete="off">
+            <button id="sendChatBtn"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <button class="chatbot-trigger-btn" id="openChatBtn">
+        <i class="fas fa-robot"></i> ASK AI
+    </button>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const openChatBtn = document.getElementById('openChatBtn');
+            const closeChatBtn = document.getElementById('closeChatBtn');
+            const chatWindow = document.getElementById('chatWindow');
+
+            if (openChatBtn && closeChatBtn && chatWindow) {
+                openChatBtn.addEventListener('click', () => {
+                    chatWindow.style.display = 'flex';
+                    openChatBtn.style.display = 'none'; 
+                });
+
+                closeChatBtn.addEventListener('click', () => {
+                    chatWindow.style.display = 'none';
+                    openChatBtn.style.display = 'flex'; 
+                });
+            }
+        });
+    </script>
 
     <script src="app.js"></script>
 </body>
