@@ -6,7 +6,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.http.*;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,8 +16,8 @@ public class ChatBotService {
     @Autowired
     private HttpSession httpSession;
 
-    @Value("${gemini.api.key}")
-    private String API_KEY;
+    private final String API_KEY = "AQ.Ab8RN6IDczX9sAJihQGZdsqkeJYaTxc7DsibuNzf6LTe7tydSg";
+    private final String API_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=" + API_KEY;
 
     public String getSmartItinerary(TravelPlanRequest request) {
         RestTemplate restTemplate = new RestTemplate();
@@ -81,8 +80,6 @@ public class ChatBotService {
     }
 
     private String callGeminiAPI(RestTemplate restTemplate, String promptText) {
-        String apiUrl = "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=" + API_KEY;
-
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
@@ -98,7 +95,7 @@ public class ChatBotService {
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(contentsMap, headers);
 
         try {
-            ResponseEntity<Map> response = restTemplate.postForEntity(apiUrl, entity, Map.class);
+            ResponseEntity<Map> response = restTemplate.postForEntity(API_URL, entity, Map.class);
             List<Map> candidates = (List<Map>) response.getBody().get("candidates");
             Map content = (Map) candidates.get(0).get("content");
             List<Map> parts = (List<Map>) content.get("parts");
