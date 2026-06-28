@@ -26,7 +26,7 @@ public class ChatBotService {
 
         if (cleanInput.equals("hi") || cleanInput.equals("hello") || cleanInput.equals("hey")) {
             httpSession.invalidate();
-            return "Greetings from Ceylon Reverie! I am your Premium Expedition Planner. How may I assist you in crafting your bespoke Sri Lankan itinerary today? Please provide your desired destination, duration, or budget preference to begin.";
+            return "Greetings from Travel Genie! I am your Premium Expedition Planner. How may I assist you in crafting your bespoke Sri Lankan itinerary today? Please provide your desired destination, duration, or budget preference to begin.";
         }
 
         String state = (httpSession.getAttribute("chat_state") != null) ? httpSession.getAttribute("chat_state").toString() : "CASUAL";
@@ -34,7 +34,7 @@ public class ChatBotService {
         if (state.equals("CASUAL") && (cleanInput.contains("plan") || cleanInput.contains("trip") || cleanInput.contains("tour") || cleanInput.contains("travel") || cleanInput.contains("itinerary"))) {
             state = "ASK_DESTINATION";
             httpSession.setAttribute("chat_state", state);
-            return "Hey brother! Awesome, let's plan a killer trip. First things first, where in Sri Lanka do you want to go? (e.g., Kandy, Ella, Down South?)";
+            return "Hey brother! Awesome, let's plan a killer trip. First things first, where in Sri Lanka do you want to go?";
         }
 
         if (state.equals("ASK_DESTINATION")) {
@@ -60,12 +60,12 @@ public class ChatBotService {
 
             httpSession.invalidate();
 
-            String fullPrompt = "You are a friendly, highly concise travel assistant for Ceylon Reverie.\n\n"
+            String fullPrompt = "You are a friendly, highly concise travel assistant for Travel Genie.\n\n"
                     + "STRICT RULES:\n"
                     + "1. MAXIMUM LENGTH: Your entire response must NOT exceed 150-200 words total.\n"
                     + "2. STRICT NEWLINE FORMATTING: You MUST start each day on a completely NEW LINE (using a line break \\n). Format exactly like this with clean line breaks:\n\n"
-                    + "Day 1: [Morning activity] -> [Afternoon activity] -> [Evening activity]\n"
-                    + "Day 2: [Morning activity] -> [Afternoon activity] -> [Evening activity]\n\n"
+                    + "Day 1: [Morning activity] -> [Afternoon activity] -> [Evening activity] -> [Night activity]\n"
+                    + "Day 2: [Morning activity] -> [Afternoon activity] -> [Evening activity] -> [Night activity]\n\n"
                     + String.format("Request Specifics: Provide an itinerary for %s days in %s for %s on a %s budget framework. Ensure each day begins on a fresh new line.",
                     duration, dest, companion, budget);
 
