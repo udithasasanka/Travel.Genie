@@ -265,6 +265,7 @@
                     <div class="form-group">
                         <label for="foodType" style="color: #0f766e;">Select Food Type</label>
                         <select id="foodType" name="foodType" onchange="calculateTotalPrice()">
+                            <option value="none" data-price="0.00">No food and beverages (+ LKR 0.00)</option>
                             <option value="local" data-price="500.00">Local Foods (+ LKR 500.00 / Day)</option>
                             <option value="western" data-price="1500.00">Western Foods (+ LKR 1,500.00 / Day)</option>
                             <option value="asian" data-price="1000.00">Asian Foods (+ LKR 1,000.00 / Day)</option>
@@ -275,6 +276,7 @@
                     <div class="form-group" style="margin-bottom: 0;">
                         <label for="transportMode" style="color: #0f766e;">Only Giving Vehicle</label>
                         <select id="transportMode" name="transportMode" onchange="calculateTotalPrice()">
+                            <option value="none" data-price="0.00">No vehicle (+ LKR 0.00)</option>
                             <option value="bike" data-price="1000.00">Bike (+ LKR 1,000.00 / Day)</option>
                             <option value="threewheel" data-price="1500.00">Three-Wheel (+ LKR 1,500.00 / Day)</option>
                             <option value="car" data-price="3500.00">Car (+ LKR 3,500.00 / Day)</option>
@@ -336,7 +338,7 @@
             const extraPricePerNight = parseFloat(selectedOption.getAttribute("data-extra")) || 0;
             const nightsCount = parseInt(document.getElementById("hotelNights").value) || 0;
 
-            // கෑම මිල ගැනීම
+            // කෑම මිල ගැනීම
             const foodSelect = document.getElementById("foodType");
             const foodPrice = parseFloat(foodSelect.options[foodSelect.selectedIndex].getAttribute("data-price")) || 0;
 
