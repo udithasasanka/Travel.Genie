@@ -7,10 +7,60 @@
     <link rel="stylesheet" th:href="@{/css/styles.css}">
     
     <style>
+        /* --- CHATBOT WIDGET RESET --- */
         .need-help, #need-help, .needhelp-btn, [class*="need-help"] {
             display: none !important;
             visibility: hidden !important;
             opacity: 0 !important;
+        }
+
+        /* --- 🛠️ FIXING THE HIDDEN CONTACT BUTTON (SPEAK WITH AN EXPERT) --- */
+        .cta-actions {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        /* පළවෙනි බටන් එක (Browse Packages) - තද තැඹිලි පාට */
+        .cta-actions .btn-primary {
+            background-color: #e67e22 !important;
+            border: 2px solid #e67e22 !important;
+            color: white !important;
+            padding: 14px 30px;
+            border-radius: 30px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(230, 126, 34, 0.2);
+        }
+
+        .cta-actions .btn-primary:hover {
+            background-color: #d35400 !important;
+            border-color: #d35400 !important;
+            transform: translateY(-2px);
+        }
+
+        /* දෙවෙනි බටන් එක (Speak with an Expert) - ලස්සනට කැපිලා පේන Outline එක */
+        .cta-actions .btn-secondary {
+            background-color: transparent !important; /* පසුබිම Transparent කරනවා */
+            border: 2px solid #009688 !important; /* වටේට ලස්සන Teal/Green Border එකක් */
+            color: #009688 !important; /* අකුරු වලට ලස්සන තද කොළ පාට */
+            padding: 14px 30px;
+            border-radius: 30px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        /* බටන් එක උඩට මවුස් එක ගෙනිච්චාම වෙනස් වන විදිහ (Hover Effect) */
+        .cta-actions .btn-secondary:hover {
+            background-color: #009688 !important; /* මවුස් එක තියද්දී පසුබිම Teal වෙනවා */
+            color: white !important; /* අකුරු සුදු වෙනවා */
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 150, 136, 0.2);
         }
     </style>
 
