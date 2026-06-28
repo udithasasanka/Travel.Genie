@@ -16,7 +16,7 @@ public class ChatBotService {
     @Autowired
     private HttpSession httpSession;
 
-    private final String API_KEY = "AQ.Ab8RN6JsE0Nc9FYgA2dCueYOuCV_4vkJ3ddupO-BITbKSrC0WQ";
+    private final String API_KEY = "AQ.Ab8RN6IQ7FlXbHJWE3usO9C8oKPbe_6gNKolJ7_uHafwMoQAoQ";
     private final String API_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=" + API_KEY;
 
     public String getSmartItinerary(TravelPlanRequest request) {
