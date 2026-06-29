@@ -21,7 +21,9 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            /* Background color eka ain kala video eka penna one nisa */
+            /* External CSS එකෙන් එන background color එක අයින් කරලා වීඩියෝ එක පේන්න දාපු කෑල්ල */
+            background-color: transparent !important;
+            background-image: none !important;
         }
 
         /* --- Background Video CSS --- */
@@ -36,8 +38,6 @@
             z-index: -1;
             transform: translate(-50%, -50%);
             object-fit: cover;
-            /* Video eka tikak dark wenna one nam meka danna: */
-            /* filter: brightness(0.6); */
         }
 
         main.container {
@@ -46,14 +46,15 @@
             justify-content: center;
             align-items: center;
             padding: 40px 20px;
-            position: relative; /* Video eka pitipassen tiyaganna */
+            position: relative;
             z-index: 1;
+            background-color: transparent !important;
         }
 
         /* Minimalist Light Login Card - With slight transparency */
         .auth-container {
-            background: rgba(255, 255, 255, 0.92); /* 0.92 nisa poddak pitipasse video eka penawa */
-            backdrop-filter: blur(8px); /* Lassanata blur effect ekak enawa */
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(8px);
             width: 100%;
             max-width: 420px;
             padding: 40px 35px;
@@ -180,11 +181,10 @@
             font-size: 0.8rem;
         }
 
-        /* Header & Footer adjustments to look good over video */
+        /* Header & Footer adjustments */
         .site-header, .site-footer {
             position: relative;
             z-index: 1;
-            /* Optional: podi background color ekak header/footer ekata danna puluwan */
             background: rgba(255, 255, 255, 0.8);
         }
     </style>
