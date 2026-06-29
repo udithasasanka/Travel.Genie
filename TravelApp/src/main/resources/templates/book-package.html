@@ -298,7 +298,6 @@
                         <input type="number" id="hotelNights" name="hotelNights" min="1" max="30" value="1" oninput="generateDynamicMeals(); calculateTotalPrice();" placeholder="Number of Days"/>
                     </div>
 
-                    <!-- 🍔 FOOD SOURCE SELECTION (RADIO BUTTONS) -->
                     <div class="form-group">
                         <label style="color: #0f766e; font-weight: 600;">Food Source Preference</label>
                         <div style="display: flex; gap: 20px; margin: 8px 0;">
@@ -313,13 +312,11 @@
                         </div>
                     </div>
 
-                    <!-- 🏨 🥞 DYNAMIC MEAL GENERATOR BOX (දවස් ගණන අනුව මෙතනට කෝඩ් හැදෙනවා) -->
                     <div class="form-group" id="hotelFoodWrapper">
                         <label style="color: #0f766e;">Customize Meals Per Day</label>
                         <div id="dynamicDaysContainer"></div>
                     </div>
 
-                    <!-- 🛵 OPTION B: OUTSIDE FOOD LIST -->
                     <div class="form-group" id="outsideFoodWrapper" style="display: none;">
                         <label for="outsideFoodType" style="color: #0f766e;">Select Outside Food Option</label>
                         <select id="outsideFoodType" name="outsideFoodType" onchange="calculateTotalPrice()">
@@ -364,15 +361,13 @@
 </footer>
 
 <script th:inline="javascript">
-    // 🧠 🎯 දවස් ගණන අනුව BREAKFAST, LUNCH, DINNER ඩ්‍රොප්-ඩවුන් මැජික් එකක් වගේ හදන FUNCTION එක
+    // 🧠 🎯 Drop-downs වලට OUTSIDE FOOD option එක එකතු කරපු function එක
     function generateDynamicMeals() {
         const nightsCount = parseInt(document.getElementById("hotelNights").value) || 0;
         const container = document.getElementById("dynamicDaysContainer");
         
-        // පරණ දත්ත ක්ලියර් කිරීම
         container.innerHTML = "";
 
-        // දවස් 1 සිට NightsCount ප්‍රමාණයට ඩයිනමික් කාඩ්ස් සෑදීම
         for (let i = 1; i <= nightsCount; i++) {
             const dayCard = document.createElement("div");
             dayCard.className = "day-meal-card";
@@ -386,6 +381,7 @@
                             <option value="none" data-price="0.00">No Breakfast (+ LKR 0.00)</option>
                             <option value="local" data-price="150.00">Local Foods Breakfast (+ LKR 150.00)</option>
                             <option value="western" data-price="450.00">Western Foods Breakfast (+ LKR 450.00)</option>
+                            <option value="outside" data-price="100.00">Outside Food (+ LKR 100.00)</option>
                         </select>
                     </div>
                     <div class="meal-select-group" style="margin-top: 6px;">
@@ -394,6 +390,7 @@
                             <option value="none" data-price="0.00">No Lunch (+ LKR 0.00)</option>
                             <option value="local" data-price="200.00">Local Foods Lunch (+ LKR 200.00)</option>
                             <option value="western" data-price="600.00">Western Foods Lunch (+ LKR 600.00)</option>
+                            <option value="outside" data-price="100.00">Outside Food (+ LKR 100.00)</option>
                         </select>
                     </div>
                     <div class="meal-select-group" style="margin-top: 6px;">
@@ -402,6 +399,7 @@
                             <option value="none" data-price="0.00">No Dinner (+ LKR 0.00)</option>
                             <option value="local" data-price="250.00">Local Foods Dinner (+ LKR 250.00)</option>
                             <option value="western" data-price="550.00">Western Foods Dinner (+ LKR 550.00)</option>
+                            <option value="outside" data-price="100.00">Outside Food (+ LKR 100.00)</option>
                         </select>
                     </div>
                 </div>
@@ -419,11 +417,11 @@
             hotelFoodWrapper.style.display = "block";
             outsideFoodWrapper.style.display = "none";
             document.getElementById("outsideFoodType").value = "none"; 
-            generateDynamicMeals(); // ආයෙත් හොටෙල් කෑම කාඩ්ස් ටික හදනවා
+            generateDynamicMeals(); 
         } else {
             hotelFoodWrapper.style.display = "none";
             outsideFoodWrapper.style.display = "block";
-            document.getElementById("dynamicDaysContainer").innerHTML = ""; // හොටෙල් කෑම ලිස්ට් හංගනවා
+            document.getElementById("dynamicDaysContainer").innerHTML = ""; 
         }
     }
 
@@ -437,7 +435,7 @@
             if(nightsInput.value === "" || nightsInput.value < 1) {
                 nightsInput.value = 1; 
             }
-            generateDynamicMeals(); // Default 1 Day එකට මුලින්ම කෑම වේල් 3 හදනවා
+            generateDynamicMeals(); 
             toggleFoodSource(); 
         } else {
             optionsContainer.style.display = "none"; 
@@ -445,7 +443,6 @@
         }
     }
 
-    // 🎯 ADVANCED LIVE PRICE CALCULATOR (හැම දවසකම, හැම ඩ්‍රොප්-ඩවුන් එකකම මිල ගණන් හරියටම එකතු කරයි)
     function calculateTotalPrice() {
         const basePrice = /*[[${package.price}]]*/ 0;
         const travelersCount = parseInt(document.getElementById("travelersInput").value) || 1;
@@ -462,23 +459,20 @@
             let totalFoodCost = 0;
 
             if (foodSource === "hotel") {
-                // ඩයිනමික්ව හැදුණු හැම දවසකම, හැම සිලෙක්ට් බොක්ස් එකකම මිල ගණන් ලූප් එකකින් එකතු කිරීම
                 const allMealSelects = document.querySelectorAll(".day-meal-select");
                 allMealSelects.forEach(selectBox => {
                     const selectedMealPrice = parseFloat(selectBox.options[selectBox.selectedIndex].getAttribute("data-price")) || 0;
-                    totalFoodCost += selectedMealPrice; // හැම වේලකම මිල සේරම එකතු වෙනවා
+                    totalFoodCost += selectedMealPrice; 
                 });
             } else {
                 const outsideFoodSelect = document.getElementById("outsideFoodType");
                 const outsidePricePerDay = parseFloat(outsideFoodSelect.options[outsideFoodSelect.selectedIndex].getAttribute("data-price")) || 0;
-                totalFoodCost = outsidePricePerDay * nightsCount; // අවුට්සයිඩ් නම් දවස් ගණනින් විතරක් වැඩි කරයි
+                totalFoodCost = outsidePricePerDay * nightsCount; 
             }
 
             const transSelect = document.getElementById("transportMode");
             const transPrice = parseFloat(transSelect.options[transSelect.selectedIndex].getAttribute("data-price")) || 0;
 
-            // 💸 අලුත්ම ඇඩ්වාන්ස්ඩ් මිල සූත්‍රය
-            // (හෝටල් මිල + වාහන මිල) * සෙනඟ * දවස් ගණන + (සියලුම කෑම වේල් වල එකතුව * සෙනඟ)
             const extraHotelAndTransCost = (extraPricePerNight + transPrice) * travelersCount * nightsCount;
             const extraFoodCostTotal = totalFoodCost * travelersCount;
             
