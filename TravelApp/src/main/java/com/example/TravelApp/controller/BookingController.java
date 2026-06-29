@@ -9,12 +9,21 @@ import com.example.TravelApp.service.EmailService;
 import com.example.TravelApp.service.HotelService;
 import com.example.TravelApp.service.TourPackageService;
 import com.example.TravelApp.service.UserService;
-import jakarta.servlet.http.HttpSession;
+import com.example.TravelApp.service.PdfService; // 🎯 PDF Service එක Import කරගන්න
+
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayInputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -25,16 +34,19 @@ public class BookingController {
     private final UserService userService;
     private final EmailService emailService;
     private final HotelService hotelService;
+    private final PdfService pdfService; // 🎯 PDF Service එක Inject කිරීමට
 
-    public BookingController(BookingService bookingService, TourPackageService tourPackageService, UserService userService, EmailService emailService, HotelService hotelService) {
+    public BookingController(BookingService bookingService, TourPackageService tourPackageService, 
+                             UserService userService, EmailService emailService, 
+                             HotelService hotelService, PdfService pdfService) {
         this.bookingService = bookingService;
         this.tourPackageService = tourPackageService;
         this.userService = userService;
         this.emailService = emailService;
         this.hotelService = hotelService;
+        this.pdfService = pdfService; // Inject
     }
 
-    // 🎯 URL එකේ ඇල ඉරි ප්‍රශ්න ආවොත් බේරෙන්න Mappings දෙකක්ම දමා ඇත
     @GetMapping({"/book/{packageId}", "/book/{packageId}/"})
     public String bookPackage(@PathVariable Long packageId, Model model) {
         TourPackage tourPackage = tourPackageService.findById(packageId).orElse(null);
@@ -51,10 +63,13 @@ public class BookingController {
                                @RequestParam Long packageId,
                                @RequestParam String userEmail,
                                @RequestParam(required = false) Long hotelId,
-                               @RequestParam(required = false, defaultValue = "1") Integer hotelNights, // HTML එකෙන් එන දවස් ගණන
-                               @RequestParam(required = false) String foodType,       // 🎯 HTML එකෙන් එන කෑම වර්ගය
-                               @RequestParam(required = false) String transportMode, // 🎯 HTML එකෙන් එන වාහන වර්ගය
+                               @RequestParam(required = false, defaultValue = "1") Integer hotelNights,
+                               @RequestParam(required = false) String foodSource,     // 🎯 Hotel ද Outside දPreference එක
+                               @RequestParam(required = false) String outsideFoodType, // 🎯 Outside Food Option එක
+                               @RequestParam(required = false) String transportMode,
+                               HttpServletRequest request, // 🎯 Day-by-Day Meal Parameters කියවීමට
                                Model model) {
+        
         Optional<TourPackage> optionalPackage = tourPackageService.findById(packageId);
         Optional<User> optionalUser = userService.findByEmail(userEmail);
         if (optionalPackage.isEmpty()) {
@@ -72,63 +87,129 @@ public class BookingController {
         booking.setTourPackage(tourPackage);
         booking.setUser(user);
 
-        // 🏨 💰 හෝටලය අනුව අමතර මිල ගැනීම
         double basePrice = tourPackage.getPrice();
         double extraPricePerNight = 0.0;
+        String selectedHotelName = "No Hotel";
 
         if (hotelId != null) {
             Optional<Hotel> optionalHotel = hotelService.findById(hotelId);
             if (optionalHotel.isPresent()) {
                 Hotel hotel = optionalHotel.get();
                 extraPricePerNight = hotel.getExtraPrice();
+                selectedHotelName = hotel.getName();
             }
         }
 
-        // 🍔 🎯 කෑම වර්ගය අනුව මිල තීරණය කිරීම (HTML එකේ මිල ගණන් වලට සර්වසම වේ)
-        double foodPrice = 0.0;
-        if (foodType != null && hotelId != null) { // හෝටලයක් තෝරාගෙන තිබේ නම් පමණක්
-            switch (foodType) {
-                case "local" -> foodPrice = 500.00;
-                case "western" -> foodPrice = 1500.00;
-                case "asian" -> foodPrice = 1000.00;
-                case "indian" -> foodPrice = 800.00;
-            }
-        }
-
-        // 🚗 🎯 වාහන වර්ගය අනුව මිල තීරණය කිරීම (HTML එකේ මිල ගණන් වලට සර්වසම වේ)
-        double transPrice = 0.0;
-        if (transportMode != null && hotelId != null) { // හෝටලයක් තෝරාගෙන තිබේ නම් පමණක්
-            switch (transportMode) {
-                case "bike" -> transPrice = 1000.00;
-                case "threewheel" -> transPrice = 1500.00;
-                case "car" -> transPrice = 3500.00;
-            }
-        }
-
-        // දවස් ගණන බිංදුවක් හෝ හිස් නම් Default 1ක් ලෙස ගනී
         int days = (hotelNights != null && hotelNights > 0) ? hotelNights : 1;
+        double totalFoodCost = 0.0;
+        StringBuilder mealDetailsSummary = new StringBuilder();
 
-        // 🧮 🎯 අවසාන සුපිරි සූත්‍රය: (මූලික මිල * සෙනඟ) + [(හෝටල් මිල + කෑම මිල + වාහන මිල) * සෙනඟ * දවස් ගණන]
-        double totalExtraCostPerPersonPerDay = extraPricePerNight + foodPrice + transPrice;
-        double totalPrice = (basePrice * booking.getTravelers()) + (totalExtraCostPerPersonPerDay * booking.getTravelers() * days);
+        // 🍔 🧠 ADVANCED DAY-BY-DAY MEAL PRICE CALCULATION LOGIC
+        if (hotelId != null) {
+            if ("hotel".equals(foodSource)) {
+                // දවස් ගණන අනුව හැම දවසකම Breakfast, Lunch, Dinner ගණන් ටික Backend එකෙන් Loop එකකින් එකතු කිරීම
+                for (int i = 1; i <= days; i++) {
+                    String breakfast = request.getParameter("day-" + i + "-breakfast");
+                    String lunch = request.getParameter("day-" + i + "-lunch");
+                    String dinner = request.getParameter("day-" + i + "-dinner");
+
+                    if (breakfast != null) {
+                        if ("local".equals(breakfast)) totalFoodCost += 150.00;
+                        else if ("western".equals(breakfast)) totalFoodCost += 450.00;
+                        else if ("outside".equals(breakfast)) totalFoodCost += 100.00;
+                    }
+                    if (lunch != null) {
+                        if ("local".equals(lunch)) totalFoodCost += 200.00;
+                        else if ("western".equals(lunch)) totalFoodCost += 600.00;
+                        else if ("outside".equals(lunch)) totalFoodCost += 100.00;
+                    }
+                    if (dinner != null) {
+                        if ("local".equals(dinner)) totalFoodCost += 250.00;
+                        else if ("western".equals(dinner)) totalFoodCost += 550.00;
+                        else if ("outside".equals(dinner)) totalFoodCost += 100.00;
+                    }
+                }
+                mealDetailsSummary.append("Customized Hotel Meals Dashboard");
+            } else if ("outside".equals(foodSource) && outsideFoodType != null) {
+                // Outside Food Preference එකක් සිලෙක්ට් කරලා තිබේ නම්
+                double outsidePricePerDay = 0.0;
+                switch (outsideFoodType) {
+                    case "delivery" -> { outsidePricePerDay = 250.00; mealDetailsSummary.append("UberEats/PickMe Handling"); }
+                    case "guide" -> { outsidePricePerDay = 400.00; mealDetailsSummary.append("Local Restaurant Guide"); }
+                    default -> { outsidePricePerDay = 0.00; mealDetailsSummary.append("Self Catering"); }
+                }
+                totalFoodCost = outsidePricePerDay * days;
+            }
+        }
+
+        // 🚗 🎯 වාහන මිල තීරණය කිරීම
+        double transPrice = 0.0;
+        String selectedVehicle = "No Vehicle";
+        if (transportMode != null && hotelId != null) {
+            switch (transportMode) {
+                case "bike" -> { transPrice = 1000.00; selectedVehicle = "Bike"; }
+                case "threewheel" -> { transPrice = 1500.00; selectedVehicle = "Three-Wheel"; }
+                case "car" -> { transPrice = 3500.00; selectedVehicle = "Car"; }
+            }
+        }
+
+        // 🧮 🎯 අවසාන ඇඩ්වාන්ස්ඩ් මිල සූත්‍රය: 
+        // (මූලික මිල * සෙනඟ) + [(හෝටල් මිල + වාහන මිල) * සෙනඟ * දවස්] + (සියලුම කෑම වල එකතුව * සෙනඟ)
+        double extraHotelAndTransCost = (extraPricePerNight + transPrice) * booking.getTravelers() * days;
+        double extraFoodCostTotal = totalFoodCost * booking.getTravelers();
+        double totalPrice = (basePrice * booking.getTravelers()) + extraHotelAndTransCost + extraFoodCostTotal;
 
         booking.setTotalPrice(totalPrice);
 
-        // 💾 ඩේටාබේස් එකට දවස් ගණන සේව් කිරීම (Booking.java එකේ field එක තිබේ නම් පමණක් මෙය uncomment කරන්න)
-        // booking.setHotelNights(days);
-
-        // 💾 Booking එක Database එකට සේව් කිරීම
+        // 💾 Booking එක සේව් කිරීම
         bookingService.save(booking);
 
-        // 📧 බුකින් එක සේව් වුණු ගමන් යූසර්ට HTML Email එකක් යැවීම
+        // 📧 Automated Success Email එක යැවීම
         try {
             emailService.sendBookingSuccessEmail(user.getEmail(), user.getName(), tourPackage.getName(), totalPrice);
         } catch (Exception e) {
-            System.out.println("❌ Email Sending Failed: " + e.getMessage());
+            System.out.println("❌ Email Sending Failed (Bypassed): " + e.getMessage());
         }
 
+        // 📄 Receipt එක ඩවුන්ලෝඩ් කරන්න අවශ්‍ය Parameters ටික Confirmation පිටුවට පාස් කිරීම
         model.addAttribute("booking", booking);
+        model.addAttribute("hotelName", selectedHotelName);
+        model.addAttribute("vehicle", selectedVehicle);
+        model.addAttribute("hotelNights", days);
+        
         return "booking-confirmation";
+    }
+
+    // 📄 🎯 INVOICE PDF DOWNLOAD ENDPOINT (අලුතින්ම එකතු කළ කොටස)
+    @GetMapping("/booking/download-receipt")
+    public ResponseEntity<InputStreamResource> downloadReceipt(
+            @RequestParam String email,
+            @RequestParam String date,
+            @RequestParam String travelers,
+            @RequestParam String packageName,
+            @RequestParam String hotelName,
+            @RequestParam String vehicle,
+            @RequestParam String totalPrice) {
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("email", email);
+        data.put("date", date);
+        data.put("travelers", travelers);
+        data.put("packageName", packageName);
+        data.put("hotelName", hotelName);
+        data.put("vehicle", vehicle);
+        data.put("totalPrice", totalPrice);
+
+        ByteArrayInputStream bis = pdfService.generateBookingReceipt(data);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=TravelApp_Receipt.pdf");
+
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(new InputStreamResource(bis));
     }
 
     @GetMapping("/bookings")
