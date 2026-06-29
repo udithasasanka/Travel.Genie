@@ -263,13 +263,36 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="foodType" style="color: #0f766e;">Select Food Type</label>
+                        <label style="color: #0f766e; font-weight: 600;">Food Source Preference</label>
+                        <div style="display: flex; gap: 20px; margin: 8px 0;">
+                            <label style="display: flex; align-items: center; gap: 6px; font-weight: normal; cursor: pointer; color: #334155;">
+                                <input type="radio" name="foodSource" value="hotel" checked onchange="toggleFoodSource(); calculateTotalPrice();" style="width: auto; margin: 0;"> 
+                                Hotel Foods
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 6px; font-weight: normal; cursor: pointer; color: #334155;">
+                                <input type="radio" name="foodSource" value="outside" onchange="toggleFoodSource(); calculateTotalPrice();" style="width: auto; margin: 0;"> 
+                                Outside Foods & Beverages
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="hotelFoodWrapper">
+                        <label for="foodType" style="color: #0f766e;">Select Hotel Food Type</label>
                         <select id="foodType" name="foodType" onchange="calculateTotalPrice()">
                             <option value="none" data-price="0.00">No food and beverages (+ LKR 0.00)</option>
                             <option value="local" data-price="500.00">Local Foods (+ LKR 500.00 / Day)</option>
                             <option value="western" data-price="1500.00">Western Foods (+ LKR 1,500.00 / Day)</option>
                             <option value="asian" data-price="1000.00">Asian Foods (+ LKR 1,000.00 / Day)</option>
                             <option value="indian" data-price="800.00">Indian Foods (+ LKR 800.00 / Day)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="outsideFoodWrapper" style="display: none;">
+                        <label for="outsideFoodType" style="color: #0f766e;">Select Outside Food Option</label>
+                        <select id="outsideFoodType" name="outsideFoodType" onchange="calculateTotalPrice()">
+                            <option value="none" data-price="0.00">Self Catering (Bring your own) (+ LKR 0.00)</option>
+                            <option value="delivery" data-price="250.00">UberEats / PickMe Delivery Handling (+ LKR 250.00 / Day)</option>
+                            <option value="guide" data-price="400.00">Local Restaurant Guide & Partner Vouchers (+ LKR 400.00 / Day)</option>
                         </select>
                     </div>
 
@@ -308,6 +331,23 @@
 </footer>
 
 <script th:inline="javascript">
+    // 🎯 Radio Buttons අනුව කෑම ඩ්‍රොප්-ඩවුන් මාරු කරන Function එක
+    function toggleFoodSource() {
+        const foodSource = document.querySelector('input[name="foodSource"]:checked').value;
+        const hotelFoodWrapper = document.getElementById("hotelFoodWrapper");
+        const outsideFoodWrapper = document.getElementById("outsideFoodWrapper");
+
+        if (foodSource === "hotel") {
+            hotelFoodWrapper.style.display = "block";
+            outsideFoodWrapper.style.display = "none";
+            document.getElementById("outsideFoodType").value = "none"; // Reset outside choice
+        } else {
+            hotelFoodWrapper.style.display = "none";
+            outsideFoodWrapper.style.display = "block";
+            document.getElementById("foodType").value = "none"; // Reset hotel choice
+        }
+    }
+
     // 🎯 හෝටලයක් සිලෙක්ට් කරලා තියෙනවා නම් විතරක් අමතර Options පෙන්වන Function එක
     function toggleHotelOptions() {
         const hotelSelect = document.getElementById("hotelId");
@@ -315,17 +355,18 @@
         const nightsInput = document.getElementById("hotelNights");
 
         if (hotelSelect.value !== "") {
-            optionsContainer.style.display = "block"; // හෝටලයක් තෝරලා නම් සේරම පෙන්වන්න
+            optionsContainer.style.display = "block"; 
             if(nightsInput.value === "" || nightsInput.value < 1) {
-                nightsInput.value = 1; // Default 1 Day සෙට් කරනවා
+                nightsInput.value = 1; 
             }
+            toggleFoodSource(); // Check food source preference state
         } else {
-            optionsContainer.style.display = "none"; // No Hotel නම් ඔක්කොම හංගන්න
+            optionsContainer.style.display = "none"; 
             nightsInput.value = 0;
         }
     }
 
-    // 🎯 Live Price Calculator (Days + Foods + Transport සේරම එකතු කරලා ගාණ හදනවා)
+    // 🎯 Live Price Calculator (Hotel Foods / Outside Foods දෙකටම හරියන්න මිල හදන හැටි)
     function calculateTotalPrice() {
         const basePrice = /*[[${package.price}]]*/ 0;
         const travelersCount = parseInt(document.getElementById("travelersInput").value) || 1;
@@ -338,15 +379,23 @@
             const extraPricePerNight = parseFloat(selectedOption.getAttribute("data-extra")) || 0;
             const nightsCount = parseInt(document.getElementById("hotelNights").value) || 0;
 
-            // කෑම මිල ගැනීම
-            const foodSelect = document.getElementById("foodType");
-            const foodPrice = parseFloat(foodSelect.options[foodSelect.selectedIndex].getAttribute("data-price")) || 0;
+            // කෑම මිල ගැනීම (Radio button එක අනුව නිවැරදි select element එකේ මිල ගනී)
+            const foodSource = document.querySelector('input[name="foodSource"]:checked').value;
+            let foodPrice = 0;
+
+            if (foodSource === "hotel") {
+                const foodSelect = document.getElementById("foodType");
+                foodPrice = parseFloat(foodSelect.options[foodSelect.selectedIndex].getAttribute("data-price")) || 0;
+            } else {
+                const outsideFoodSelect = document.getElementById("outsideFoodType");
+                foodPrice = parseFloat(outsideFoodSelect.options[outsideFoodSelect.selectedIndex].getAttribute("data-price")) || 0;
+            }
 
             // වාහන මිල ගැනීම
             const transSelect = document.getElementById("transportMode");
             const transPrice = parseFloat(transSelect.options[transSelect.selectedIndex].getAttribute("data-price")) || 0;
 
-            // 💸 අලුත් සූත්‍රය = (මූලික මිල * සෙනඟ) + [(හෝටල් මිල + කෑම මිල + වාහන මිල) * සෙනඟ * දවස් ගණන]
+            // 💸 මිල සූත්‍රය = (මූලික මිල * සෙනඟ) + [(හෝටල් මිල + කෑම මිල + වාහන මිල) * සෙනඟ * දවස් ගණන]
             const extraCost = (extraPricePerNight + foodPrice + transPrice) * travelersCount * nightsCount;
             totalPrice += extraCost;
         }
