@@ -34,8 +34,9 @@ public class BookingController {
     private final UserService userService;
     private final EmailService emailService;
     private final HotelService hotelService;
-    private final PdfService pdfService; // 🎯 PDF Service එක Inject කිරීමට
+    private final PdfService pdfService; // 🎯 1. මෙතන ක්ලාස් විචල්‍යය නිවැරදිව තියෙනවා මචං
 
+    // 🎯 2. Constructor එක ඇතුළට PdfService එක දමා Dependencies ඔක්කොම Inject කිරීම
     public BookingController(BookingService bookingService, TourPackageService tourPackageService, 
                              UserService userService, EmailService emailService, 
                              HotelService hotelService, PdfService pdfService) {
@@ -44,9 +45,10 @@ public class BookingController {
         this.userService = userService;
         this.emailService = emailService;
         this.hotelService = hotelService;
-        this.pdfService = pdfService; // Inject
+        this.pdfService = pdfService; 
     }
 
+    // 🎯 පැකේජ් එකක් බුක් කරන මුල් පිටුව පෙන්වීම
     @GetMapping({"/book/{packageId}", "/book/{packageId}/"})
     public String bookPackage(@PathVariable Long packageId, Model model) {
         TourPackage tourPackage = tourPackageService.findById(packageId).orElse(null);
@@ -58,16 +60,17 @@ public class BookingController {
         return "book-package";
     }
 
+    // 🎯 බුකින් එක Form එකෙන් සබ්මිට් කරද්දී මිල ගණන් හදලා සේව් කරන තැන
     @PostMapping("/book")
     public String placeBooking(@ModelAttribute Booking booking,
                                @RequestParam Long packageId,
                                @RequestParam String userEmail,
                                @RequestParam(required = false) Long hotelId,
                                @RequestParam(required = false, defaultValue = "1") Integer hotelNights,
-                               @RequestParam(required = false) String foodSource,     // 🎯 Hotel ද Outside දPreference එක
-                               @RequestParam(required = false) String outsideFoodType, // 🎯 Outside Food Option එක
+                               @RequestParam(required = false) String foodSource,     
+                               @RequestParam(required = false) String outsideFoodType, 
                                @RequestParam(required = false) String transportMode,
-                               HttpServletRequest request, // 🎯 Day-by-Day Meal Parameters කියවීමට
+                               HttpServletRequest request, 
                                Model model) {
         
         Optional<TourPackage> optionalPackage = tourPackageService.findById(packageId);
@@ -102,12 +105,10 @@ public class BookingController {
 
         int days = (hotelNights != null && hotelNights > 0) ? hotelNights : 1;
         double totalFoodCost = 0.0;
-        StringBuilder mealDetailsSummary = new StringBuilder();
 
-        // 🍔 🧠 ADVANCED DAY-BY-DAY MEAL PRICE CALCULATION LOGIC
+        // 🍔 🧠 DAY-BY-DAY MEAL PRICE CALCULATION LOGIC (BACKEND LOOP)
         if (hotelId != null) {
             if ("hotel".equals(foodSource)) {
-                // දවස් ගණන අනුව හැම දවසකම Breakfast, Lunch, Dinner ගණන් ටික Backend එකෙන් Loop එකකින් එකතු කිරීම
                 for (int i = 1; i <= days; i++) {
                     String breakfast = request.getParameter("day-" + i + "-breakfast");
                     String lunch = request.getParameter("day-" + i + "-lunch");
@@ -129,20 +130,18 @@ public class BookingController {
                         else if ("outside".equals(dinner)) totalFoodCost += 100.00;
                     }
                 }
-                mealDetailsSummary.append("Customized Hotel Meals Dashboard");
             } else if ("outside".equals(foodSource) && outsideFoodType != null) {
-                // Outside Food Preference එකක් සිලෙක්ට් කරලා තිබේ නම්
                 double outsidePricePerDay = 0.0;
                 switch (outsideFoodType) {
-                    case "delivery" -> { outsidePricePerDay = 250.00; mealDetailsSummary.append("UberEats/PickMe Handling"); }
-                    case "guide" -> { outsidePricePerDay = 400.00; mealDetailsSummary.append("Local Restaurant Guide"); }
-                    default -> { outsidePricePerDay = 0.00; mealDetailsSummary.append("Self Catering"); }
+                    case "delivery" -> outsidePricePerDay = 250.00;
+                    case "guide" -> outsidePricePerDay = 400.00;
+                    default -> outsidePricePerDay = 0.00;
                 }
                 totalFoodCost = outsidePricePerDay * days;
             }
         }
 
-        // 🚗 🎯 වාහන මිල තීරණය කිරීම
+        // 🚗 වාහන මිල තීරණය කිරීම
         double transPrice = 0.0;
         String selectedVehicle = "No Vehicle";
         if (transportMode != null && hotelId != null) {
@@ -153,25 +152,24 @@ public class BookingController {
             }
         }
 
-        // 🧮 🎯 අවසාන ඇඩ්වාන්ස්ඩ් මිල සූත්‍රය: 
-        // (මූලික මිල * සෙනඟ) + [(හෝටල් මිල + වාහන මිල) * සෙනඟ * දවස්] + (සියලුම කෑම වල එකතුව * සෙනඟ)
+        // 🧮 💸 අවසාන සුපිරි සූත්‍රය: 
         double extraHotelAndTransCost = (extraPricePerNight + transPrice) * booking.getTravelers() * days;
         double extraFoodCostTotal = totalFoodCost * booking.getTravelers();
         double totalPrice = (basePrice * booking.getTravelers()) + extraHotelAndTransCost + extraFoodCostTotal;
 
         booking.setTotalPrice(totalPrice);
 
-        // 💾 Booking එක සේව් කිරීම
+        // 💾 Booking එක Database එකට සේව් කිරීම
         bookingService.save(booking);
 
         // 📧 Automated Success Email එක යැවීම
         try {
             emailService.sendBookingSuccessEmail(user.getEmail(), user.getName(), tourPackage.getName(), totalPrice);
         } catch (Exception e) {
-            System.out.println("❌ Email Sending Failed (Bypassed): " + e.getMessage());
+            System.out.println("❌ Email Sending Bypassed: " + e.getMessage());
         }
 
-        // 📄 Receipt එක ඩවුන්ලෝඩ් කරන්න අවශ්‍ය Parameters ටික Confirmation පිටුවට පාස් කිරීම
+        // 📄 Confirmation පිටුවට අදාළ ඩේටා පාස් කිරීම
         model.addAttribute("booking", booking);
         model.addAttribute("hotelName", selectedHotelName);
         model.addAttribute("vehicle", selectedVehicle);
@@ -212,6 +210,7 @@ public class BookingController {
                 .body(new InputStreamResource(bis));
     }
 
+    // 🎯 යූසර්ගේ පැරණි Booking History පෙන්වන පිටුව
     @GetMapping("/bookings")
     public String bookingHistory(@RequestParam String userEmail, Model model) {
         Optional<User> user = userService.findByEmail(userEmail);
