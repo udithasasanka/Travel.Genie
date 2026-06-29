@@ -4,10 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TravelApp — Premium Admin Dashboard</title>
-    <!-- Google Fonts & FontAwesome Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <style>
         * {
             margin: 0;
@@ -224,7 +223,7 @@
 
         /* --- TOTAL REVENUE PREMIUM WIDGET --- */
         .revenue-card {
-            background-color: #00a88f; /* ස්ක්‍රීන්ෂොට් එකේ පල්ලෙහායින්ම තියෙන තද පීච්/කොළ පාට ලොකු බැනර් එක */
+            background-color: #00a88f;
             color: white;
             border-radius: 24px;
             padding: 35px;
@@ -371,168 +370,158 @@
 </head>
 <body>
 
-    <!-- 🌿 LEFT PREMIUM SIDEBAR MENU -->
-    <div class="sidebar">
-        <div class="logo">
-            <i class="fa-solid fa-leaf"></i> Travel<span>Pro</span>
+<div class="sidebar">
+    <div class="logo">
+        <i class="fa-solid fa-leaf"></i> Travel<span>Pro</span>
+    </div>
+    <ul class="menu-links">
+        <li><a href="/admin" class="active"><i class="fa-solid fa-chart-pie"></i> Dashboard</a></li>
+        <li><a href="/admin/users"><i class="fa-solid fa-users"></i> Users</a></li>
+        <li><a href="/admin/destinations"><i class="fa-solid fa-map-location-dot"></i> Destinations</a></li>
+        <li><a href="/admin/packages"><i class="fa-solid fa-cubes"></i> Packages</a></li>
+        <li><a href="/admin/bookings"><i class="fa-solid fa-calendar-check"></i> Bookings</a></li>
+        <li><a href="/admin/reviews"><i class="fa-solid fa-star"></i> Reviews</a></li>
+        <li><a href="/admin/inbox"><i class="fa-solid fa-envelope"></i> Inbox</a></li>
+    </ul>
+</div>
+
+<div class="main-content">
+
+    <header class="site-header">
+        <a class="brand-title" th:href="@{/}">TravelApp</a>
+        <nav class="top-nav">
+            <a th:href="@{/}">Home</a>
+            <a th:href="@{/admin}">Dashboard</a>
+            <a th:href="@{/logout}"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="page-title-row">
+            <div>
+                <p class="page-subtitle">Admin Dashboard</p>
+                <h2>Operational overview</h2>
+            </div>
+            <div class="top-actions">
+                <button class="btn-top btn-teal" onclick="exportTableToCSV('recent-bookings-report.csv')">Export report</button>
+                <a th:href="@{/admin/packages/add}" class="btn-top btn-teal" style="text-decoration:none;">Create package</a>
+            </div>
         </div>
-        <ul class="menu-links">
-            <li><a href="/admin" class="active"><i class="fa-solid fa-chart-pie"></i> Dashboard</a></li>
-            <li><a href="/admin/users"><i class="fa-solid fa-users"></i> Users</a></li>
-            <li><a href="/admin/destinations"><i class="fa-solid fa-map-location-dot"></i> Destinations</a></li>
-            <li><a href="/admin/packages"><i class="fa-solid fa-cubes"></i> Packages</a></li>
-            <li><a href="/admin/bookings"><i class="fa-solid fa-calendar-check"></i> Bookings</a></li>
-            <li><a href="/admin/reviews"><i class="fa-solid fa-star"></i> Reviews</a></li>
-        </ul>
-    </div>
 
-    <!-- 💻 MAIN CONTENT DISPLAY CONTAINER -->
-    <div class="main-content">
-        
-        <!-- TOP NAVIGATION HEADER -->
-        <header class="site-header">
-            <a class="brand-title" th:href="@{/}">TravelApp</a>
-            <nav class="top-nav">
-                <a th:href="@{/}">Home</a>
-                <a th:href="@{/admin}">Dashboard</a>
-                <a th:href="@{/logout}"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
-            </nav>
-        </header>
-
-        <main>
-            <!-- DASHBOARD SECTION HEADER -->
-            <div class="page-title-row">
-                <div>
-                    <p class="page-subtitle">Admin Dashboard</p>
-                    <h2>Operational overview</h2>
-                </div>
-                <div class="top-actions">
-                    <button class="btn-top btn-teal" onclick="exportTableToCSV('recent-bookings-report.csv')">Export report</button>
-                    <a th:href="@{/admin/packages/add}" class="btn-top btn-teal" style="text-decoration:none;">Create package</a>
-                </div>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Users</h3>
+                <p th:text="${totalUsers}">3</p>
+                <span class="card-sub">Active this month</span>
             </div>
-
-            <!-- 📊 MODERN ROW OF STATS CARDS -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <h3>Total Users</h3>
-                    <p th:text="${totalUsers}">3</p>
-                    <span class="card-sub">Active this month</span>
-                </div>
-                <div class="stat-card">
-                    <h3>Destinations</h3>
-                    <p th:text="${totalDestinations}">13</p>
-                    <span class="card-sub">Unique locations</span>
-                </div>
-                <div class="stat-card">
-                    <h3>Packages</h3>
-                    <p th:text="${totalPackages}">13</p>
-                    <span class="card-sub">Ready for booking</span>
-                </div>
-                <div class="stat-card">
-                    <h3>Bookings</h3>
-                    <p th:text="${totalBookings}">0</p>
-                    <span class="card-sub">New this week</span>
-                </div>
+            <div class="stat-card">
+                <h3>Destinations</h3>
+                <p th:text="${totalDestinations}">13</p>
+                <span class="card-sub">Unique locations</span>
             </div>
-
-            <!-- 💰 TOTAL REVENUE PREMIUM BANNER -->
-            <div class="revenue-card">
-                <div class="revenue-info">
-                    <h3>Total Revenue</h3>
-                    <p th:text="${'LKR ' + #numbers.formatDecimal(totalRevenue, 1, 2)}">LKR 0.00</p>
-                    <div class="revenue-sub">Revenue captured from live sales</div>
-                </div>
-                <div class="revenue-badge">
-                    <i class="fa-solid fa-trending-up"></i> +12.8% vs last month
-                </div>
+            <div class="stat-card">
+                <h3>Packages</h3>
+                <p th:text="${totalPackages}">13</p>
+                <span class="card-sub">Ready for booking</span>
             </div>
-
-            <!-- 📋 RECENT BOOKINGS ROUNDED TABLE CONTROLLER -->
-            <div class="section-container">
-                <div class="section-title"><i class="fa-solid fa-clock-rotate-left"></i> Recent Bookings</div>
-                
-                <table class="custom-table" th:if="${recentBookings != null and !recentBookings.isEmpty()}">
-                    <thead>
-                        <tr>
-                            <th>User</th>
-                            <th>Package</th>
-                            <th>Travel Date</th>
-                            <th>Travelers</th>
-                            <th>Total Price</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="booking : ${recentBookings}">
-                            <td th:text="${booking.user != null ? booking.user.name : 'Anonymous'}" style="font-weight: 500;"></td>
-                            <td th:text="${booking.tourPackage != null ? booking.tourPackage.name : 'N/A'}"></td>
-                            <td th:text="${booking.travelDate}"></td>
-                            <td th:text="${booking.travelers}"></td>
-                            <td th:text="'LKR ' + ${booking.totalPrice}" style="font-weight: 600; color: #009688;"></td>
-                            <td>
-                                <span class="status-badge status-success" th:text="${booking.status}">Confirmed</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                
-                <p th:if="${recentBookings == null || recentBookings.isEmpty()}" style="color: #64748b; font-size: 14px; text-align: center; padding: 20px 0;">
-                    <i class="fa-solid fa-folder-open" style="display:block; font-size: 24px; margin-bottom: 10px; color: #cbd5e1;"></i> No recent bookings found.
-                </p>
+            <div class="stat-card">
+                <h3>Bookings</h3>
+                <p th:text="${totalBookings}">0</p>
+                <span class="card-sub">New this week</span>
             </div>
+        </div>
 
-            <!-- ⚡ QUICK CREATION ACTIONS -->
-            <div class="section-title"><i class="fa-solid fa-bolt"></i> Quick Actions</div>
-            <div class="quick-actions-grid">
-                <a th:href="@{/admin/users/add}" class="btn-action-card">
-                    <i class="fa-solid fa-user-plus"></i> Add New User
-                </a>
-                <a th:href="@{/admin/destinations/add}" class="btn-action-card">
-                    <i class="fa-solid fa-map-pin"></i> Add New Destination
-                </a>
-                <a th:href="@{/admin/packages/add}" class="btn-action-card">
-                    <i class="fa-solid fa-square-plus"></i> Add New Package
-                </a>
+        <div class="revenue-card">
+            <div class="revenue-info">
+                <h3>Total Revenue</h3>
+                <p th:text="${'LKR ' + #numbers.formatDecimal(totalRevenue, 1, 2)}">LKR 0.00</p>
+                <div class="revenue-sub">Revenue captured from live sales</div>
             </div>
-        </main>
-    </div>
-    <!-- 📊 JAVASCRIPT FOR DYNAMIC CSV REPORT EXPORT -->
-    <script>
-        function exportTableToCSV(filename) {
-            var csv = [];
-            // ඩෑෂ්බෝඩ් එකේ තියෙන Recent Bookings Table එක සිලෙක්ට් කරනවා
-            var table = document.querySelector(".custom-table");
-            
-            if (!table) {
-                alert("No table data found to export!");
-                return;
-            }
-            
-            var rows = table.querySelectorAll("tr");
-            
-            for (var i = 0; i < rows.length; i++) {
-                var row = [], cols = rows[i].querySelectorAll("td, th");
-                
-                for (var j = 0; j < cols.length; j++) {
-                    // බටන්ස් හෝ වෙනත් අයිකන්ස් තිබුණොත් ඒවා අතහැර පිරිසිදු Text එක විතරක් ගන්නවා
-                    var text = cols[j].innerText.replace(/"/g, '""'); 
-                    row.push('"' + text + '"');
-                }
-                
-                csv.push(row.join(","));
-            }
+            <div class="revenue-badge">
+                <i class="fa-solid fa-trending-up"></i> +12.8% vs last month
+            </div>
+        </div>
 
-            // CSV ෆයිල් එකක් විදිහට බ්‍රවුසර් එකෙන් ඩවුන්ලෝඩ් කිරීම
-            var csvFile = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
-            var downloadLink = document.createElement("a");
-            downloadLink.download = filename;
-            downloadLink.href = window.URL.createObjectURL(csvFile);
-            downloadLink.style.display = "none";
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
+        <div class="section-container">
+            <div class="section-title"><i class="fa-solid fa-clock-rotate-left"></i> Recent Bookings</div>
+
+            <table class="custom-table" th:if="${recentBookings != null and !recentBookings.isEmpty()}">
+                <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Package</th>
+                    <th>Travel Date</th>
+                    <th>Travelers</th>
+                    <th>Total Price</th>
+                    <th>Status</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="booking : ${recentBookings}">
+                    <td th:text="${booking.user != null ? booking.user.name : 'Anonymous'}" style="font-weight: 500;"></td>
+                    <td th:text="${booking.tourPackage != null ? booking.tourPackage.name : 'N/A'}"></td>
+                    <td th:text="${booking.travelDate}"></td>
+                    <td th:text="${booking.travelers}"></td>
+                    <td th:text="'LKR ' + ${booking.totalPrice}" style="font-weight: 600; color: #009688;"></td>
+                    <td>
+                        <span class="status-badge status-success" th:text="${booking.status}">Confirmed</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <p th:if="${recentBookings == null || recentBookings.isEmpty()}" style="color: #64748b; font-size: 14px; text-align: center; padding: 20px 0;">
+                <i class="fa-solid fa-folder-open" style="display:block; font-size: 24px; margin-bottom: 10px; color: #cbd5e1;"></i> No recent bookings found.
+            </p>
+        </div>
+
+        <div class="section-title"><i class="fa-solid fa-bolt"></i> Quick Actions</div>
+        <div class="quick-actions-grid">
+            <a th:href="@{/admin/users/add}" class="btn-action-card">
+                <i class="fa-solid fa-user-plus"></i> Add New User
+            </a>
+            <a th:href="@{/admin/destinations/add}" class="btn-action-card">
+                <i class="fa-solid fa-map-pin"></i> Add New Destination
+            </a>
+            <a th:href="@{/admin/packages/add}" class="btn-action-card">
+                <i class="fa-solid fa-square-plus"></i> Add New Package
+            </a>
+        </div>
+    </main>
+</div>
+
+<script>
+    function exportTableToCSV(filename) {
+        var csv = [];
+        var table = document.querySelector(".custom-table");
+
+        if (!table) {
+            alert("No table data found to export!");
+            return;
         }
-    </script>
+
+        var rows = table.querySelectorAll("tr");
+
+        for (var i = 0; i < rows.length; i++) {
+            var row = [], cols = rows[i].querySelectorAll("td, th");
+
+            for (var j = 0; j < cols.length; j++) {
+                var text = cols[j].innerText.replace(/"/g, '""');
+                row.push('"' + text + '"');
+            }
+
+            csv.push(row.join(","));
+        }
+
+        var csvFile = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
+        var downloadLink = document.createElement("a");
+        downloadLink.download = filename;
+        downloadLink.href = window.URL.createObjectURL(csvFile);
+        downloadLink.style.display = "none";
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+    }
+</script>
 
 </body>
 </html>
