@@ -72,7 +72,7 @@ public class ChatBotService {
             return callGeminiAPI(restTemplate, fullPrompt);
         }
 
-        String casualPrompt = "You are a friendly, supportive, and brotherly travel assistant for Ceylon Reverie. "
+        String casualPrompt = "You are a friendly, supportive, and brotherly travel assistant for Travel Genie. "
                 + "The user is just chatting casually, talking about emotions, or asking random things. Respond warmly, supportively, and very briefly (under 80 words) like a helpful peer. Do NOT give any structured travel day-by-day plans or ask for destinations here.\n\n"
                 + "User Message: " + userInput;
 
