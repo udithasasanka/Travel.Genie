@@ -21,7 +21,7 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            /* 🎨 වීඩියෝ එක වෙනුවට සේෆ් ලස්සන Gradient බැක්ග්‍රවුන්ඩ් එකක් දැම්මා ලෙඩේ නැති කරන්න */
+            /* 🎨 [FIX] වීඩියෝ එක වෙනුවට සර්වර් එකට සේෆ් Gradient බැක්ග්‍රවුන්ඩ් එකක් දැම්මා */
             background: linear-gradient(135deg, #0f766e, #0d9488) !important;
         }
 
@@ -203,6 +203,7 @@
     <div class="container">
         <p style="margin:0;">© 2026 TravelApp. All Rights Reserved.</p>
     </div>
-    </footer>
+    <div th:replace="fragments :: chatbot"></div>
+</footer>
 </body>
 </html>
