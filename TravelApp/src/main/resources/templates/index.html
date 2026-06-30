@@ -21,9 +21,8 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            background-color: transparent !important;
-            background: transparent !important;
-            background-image: none !important;
+            /* 🎨 [FIX] සෙෂන් එක කුඩු කරන වීඩියෝ එක වෙනුවට සේෆ් Emerald Gradient බැක්ග්‍රවුන්ඩ් එකක් දැම්මා */
+            background: linear-gradient(135deg, #0f766e, #0d9488) !important;
         }
 
         body::before {
@@ -33,22 +32,8 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background-color: rgba(0, 0, 0, 0.35);
+            background-color: rgba(0, 0, 0, 0.2);
             z-index: -1;
-        }
-
-        /* --- Background Video CSS --- */
-        .bg-video {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            min-width: 100%;
-            min-height: 100%;
-            width: auto;
-            height: auto;
-            z-index: -2;
-            transform: translate(-50%, -50%);
-            object-fit: cover;
         }
 
         main.container {
@@ -64,8 +49,8 @@
 
         /* 🎯 Glassmorphism Login Card (Transparent) */
         .auth-container {
-            background: rgba(255, 255, 255, 0.15); /* 85% Transparent කළා */
-            backdrop-filter: blur(15px); /* බොඳ වෙන ගතිය ටිකක් වැඩි කළා */
+            background: rgba(255, 255, 255, 0.15); 
+            backdrop-filter: blur(15px); 
             -webkit-backdrop-filter: blur(15px);
             width: 100%;
             max-width: 420px;
@@ -76,15 +61,14 @@
             box-sizing: border-box;
         }
 
-        /* 🎯 අකුරු සුදු පාට කිරීම */
         .auth-container h2 {
             font-size: 1.8rem;
             font-weight: 700;
-            color: #ffffff; /* සුදු පාට */
+            color: #ffffff; 
             text-align: center;
             margin-top: 0;
             margin-bottom: 25px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5); /* අකුරු කැපිලා පේන්න පොඩි සෙවනැල්ලක් දුන්නා */
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5); 
         }
 
         .form-group {
@@ -96,25 +80,24 @@
             font-size: 0.9rem;
             font-weight: 600;
             margin-bottom: 8px;
-            color: #ffffff; /* සුදු පාට */
+            color: #ffffff; 
         }
 
-        /* 🎯 Input Fields වල හැඩය සහ පාට වෙනස් කිරීම */
         .form-group input {
             width: 100%;
             padding: 14px 16px;
-            background: rgba(255, 255, 255, 0.1); /* Input එකත් Transparent කළා */
+            background: rgba(255, 255, 255, 0.1); 
             border: 1px solid rgba(255, 255, 255, 0.4);
             border-radius: 12px;
             font-family: inherit;
             font-size: 14px;
-            color: #ffffff; /* ටයිප් කරන අකුරු සුදු පාට කළා */
+            color: #ffffff; 
             transition: all 0.2s ease;
             box-sizing: border-box;
         }
 
         .form-group input::placeholder {
-            color: rgba(255, 255, 255, 0.7); /* Placeholder එක ලා සුදු කළා */
+            color: rgba(255, 255, 255, 0.7); 
         }
 
         .form-group input:focus {
@@ -146,20 +129,15 @@
             box-shadow: 0 6px 20px rgba(15, 118, 110, 0.4);
         }
 
-        .btn-login:active {
-            transform: translateY(0);
-        }
-
-        /* Bottom Link Styling */
         .auth-link {
             text-align: center;
             margin-top: 15px;
             font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.85); /* සුදු පාටට හුරු කළා */
+            color: rgba(255, 255, 255, 0.85); 
         }
 
         .auth-link a {
-            color: #fbbf24; /* ලා කහ පාටක් දුන්නා කැපිලා පේන්න */
+            color: #fbbf24; 
             text-decoration: none;
             font-weight: 600;
             transition: color 0.2s ease;
@@ -170,7 +148,6 @@
             text-decoration: underline;
         }
 
-        /* Notifications */
         .error {
             background-color: rgba(254, 242, 242, 0.9);
             color: #991b1b;
@@ -193,25 +170,24 @@
             font-weight: 500;
         }
 
-        /* 🎯 Header සහ Footer සම්පූර්ණයෙන්ම Transparent */
         .site-header, .site-footer {
             position: relative;
             z-index: 1;
-            background-color: transparent !important;
             background: transparent !important;
             box-shadow: none !important;
             border: none !important;
-            backdrop-filter: none !important;
-            -webkit-backdrop-filter: none !important;
         }
 
-        /* 🎯 Header එකේ අකුරු සුදු පාට කිරීම */
         .site-header a, .site-header h1 a, .site-header nav a {
             color: #ffffff !important;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.6); /* අකුරු පැහැදිලිව පේන්න */
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.6); 
+            text-decoration: none;
+        }
+        
+        .site-header nav a {
+            margin-left: 15px;
         }
 
-        /* 🎯 Footer එකේ අකුරු සුදු පාට කිරීම */
         .site-footer p {
             color: #ffffff !important;
             text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
@@ -220,17 +196,12 @@
 </head>
 <body>
 
-<video autoplay muted loop class="bg-video">
-    <source th:src="@{/videos/login.mp4}" type="video/mp4">
-    Your browser does not support HTML5 video.
-</video>
-
-<header class="site-header">
-    <div class="container header-inner">
-        <h1><a th:href="@{/}">TravelApp</a></h1>
+<header class="site-header" style="padding: 20px;">
+    <div class="container header-inner" style="display: flex; justify-content: space-between; align-items: center;">
+        <h1 style="margin:0;"><a th:href="@{/}">TravelApp</a></h1>
         <nav>
             <a th:href="@{/}">Home</a>
-            <a th:href="@{/login}">Login</a>
+            <a th:href="@{/login}" style="font-weight: bold;">Login</a>
             <a th:href="@{/register}">Register</a>
         </nav>
     </div>
@@ -245,12 +216,12 @@
 
         <form method="post" th:action="@{/login}">
             <div class="form-group">
-                <label th:for="email">Email</label>
-                <input type="email" id="email" name="email" required placeholder="your@gmail.com"/>
+                <label>Email</label>
+                <input type="email" name="email" required placeholder="your@gmail.com"/>
             </div>
             <div class="form-group">
-                <label th:for="password">Password</label>
-                <input type="password" id="password" name="password" required placeholder="Your password"/>
+                <label>Password</label>
+                <input type="password" name="password" required placeholder="Your password"/>
             </div>
             <button type="submit" class="btn-login">Login</button>
         </form>
@@ -265,11 +236,10 @@
     </div>
 </main>
 
-<footer class="site-footer">
+<footer class="site-footer" style="text-align: center; padding: 20px;">
     <div class="container">
         <p>© 2026 TravelApp. All Rights Reserved.</p>
     </div>
-    <div th:replace="fragments :: chatbot"></div>
-</footer>
+    </footer>
 </body>
 </html>
