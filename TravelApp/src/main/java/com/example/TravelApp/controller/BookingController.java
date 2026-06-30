@@ -164,7 +164,7 @@ public class BookingController {
 
         // 📧 Automated Success Email එක යැවීම
         try {
-            emailService.sendBookingSuccessEmail(user.getEmail(), user.getName(), tourPackage.getName(), totalPrice);
+            emailService.sendBookingSuccessEmail(user.getEmail(), user.getName(), tourPackage.getName(), String.valueOf(totalPrice));
         } catch (Exception e) {
             System.out.println("❌ Email Sending Bypassed: " + e.getMessage());
         }
