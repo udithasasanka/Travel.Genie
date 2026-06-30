@@ -1,4 +1,4 @@
-<div th:fragment="chatbot">
+<div th:fragment="chatbot" th:if="${#httpServletRequest.requestURI != '/login'}">
     <!-- Luxury Trigger Button -->
     <button class="chatbot-trigger-btn" id="openChatBtn" onclick="toggleChat()">
         <i class="fas fa-robot"></i> ASK AI
