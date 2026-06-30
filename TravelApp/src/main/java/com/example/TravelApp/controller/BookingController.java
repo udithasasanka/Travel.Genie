@@ -48,7 +48,6 @@ public class BookingController {
         this.pdfService = pdfService; 
     }
 
-    // පැකේජ් එකක් බුක් කරන මුල් පිටුව පෙන්වීම
     @GetMapping({"/book/{packageId}", "/book/{packageId}/"})
     public String bookPackage(@PathVariable Long packageId, Model model) {
         TourPackage tourPackage = tourPackageService.findById(packageId).orElse(null);
@@ -60,7 +59,6 @@ public class BookingController {
         return "book-package";
     }
 
-    // බුකින් එක Form එකෙන් සබ්මිට් කරද්දී මිල ගණන් හදලා සේව් කරන තැන
     @PostMapping("/book")
     public String placeBooking(@ModelAttribute Booking booking,
                                @RequestParam Long packageId,
@@ -106,7 +104,6 @@ public class BookingController {
         int days = (hotelNights != null && hotelNights > 0) ? hotelNights : 1;
         double totalFoodCost = 0.0;
 
-        // 🍔 🧠 DAY-BY-DAY MEAL PRICE CALCULATION LOGIC
         if (hotelId != null) {
             if ("hotel".equals(foodSource)) {
                 for (int i = 1; i <= days; i++) {
@@ -141,7 +138,6 @@ public class BookingController {
             }
         }
 
-        // 🚗 වාහන මිල තීරණය කිරීම
         double transPrice = 0.0;
         String selectedVehicle = "No Vehicle";
         if (transportMode != null && hotelId != null) {
@@ -152,30 +148,20 @@ public class BookingController {
             }
         }
 
-        // 🧮 💸 මිල ගණන් සෑදීමේ සූත්‍රය
         double extraHotelAndTransCost = (extraPricePerNight + transPrice) * booking.getTravelers() * days;
         double extraFoodCostTotal = totalFoodCost * booking.getTravelers();
         double totalPrice = (basePrice * booking.getTravelers()) + extraHotelAndTransCost + extraFoodCostTotal;
 
         booking.setTotalPrice(totalPrice);
-
-        // 💾 Booking එක Database එකට සේව් කිරීම
         bookingService.save(booking);
 
-        // 📧 🎯 AUTOMATED SUCCESS EMAIL LOGIC FIXED (පරාමිතීන් 3කට සකස් කිරීම)
+        // 📧 🎯 AUTOMATED SUCCESS EMAIL FIXED FOR YOUR EMAILSERVICE SIGNATURE
         try {
-            String emailSubject = "Booking Confirmation - " + tourPackage.getName();
-            String emailBody = "Dear " + user.getName() + ",\n\n" +
-                               "Your booking for " + tourPackage.getName() + " has been successfully placed.\n" +
-                               "Total Price: LKR " + totalPrice + "\n\n" +
-                               "Thank you for traveling with us!";
-                               
-            emailService.sendBookingSuccessEmail(user.getEmail(), emailSubject, emailBody);
+            emailService.sendBookingSuccessEmail(user.getEmail(), user.getName(), tourPackage.getName(), totalPrice);
         } catch (Exception e) {
             System.out.println("❌ Email Sending Bypassed: " + e.getMessage());
         }
 
-        // 📄 Confirmation පිටුවට අදාළ ඩේටා පාස් කිරීම
         model.addAttribute("booking", booking);
         model.addAttribute("hotelName", selectedHotelName);
         model.addAttribute("vehicle", selectedVehicle);
@@ -184,7 +170,6 @@ public class BookingController {
         return "booking-confirmation";
     }
 
-    // 📄 🎯 INVOICE PDF DOWNLOAD ENDPOINT
     @GetMapping("/booking/download-receipt")
     public ResponseEntity<InputStreamResource> downloadReceipt(
             @RequestParam String email,
@@ -216,7 +201,6 @@ public class BookingController {
                 .body(new InputStreamResource(bis));
     }
 
-    // 🎯 යූසර්ගේ පැරණි Booking History පෙන්වන පිටුව
     @GetMapping("/bookings")
     public String bookingHistory(@RequestParam String userEmail, Model model) {
         Optional<User> user = userService.findByEmail(userEmail);
