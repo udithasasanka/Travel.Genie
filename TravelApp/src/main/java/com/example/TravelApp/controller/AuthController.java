@@ -3,6 +3,7 @@ package com.example.TravelApp.controller;
 import com.example.TravelApp.model.User;
 import com.example.TravelApp.service.EmailService; 
 import com.example.TravelApp.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,39 +23,50 @@ public class AuthController {
 
     @GetMapping("/login")
     public String login() {
-        return "login";
+        return "signin"; // 🎯 [FIX] නම වෙනස් කළ signin.html එක ලෝඩ් කිරීම
     }
 
     @PostMapping("/login")
     public String loginSubmit(@RequestParam String email, @RequestParam String password,
-                              HttpSession session, Model model) {
+                              HttpServletRequest request, Model model) {
         
-        // 🚨 [FIX] පැරණි සෙෂන් එකක් ඉතිරි වී ඇත්නම් එය සම්පූර්ණයෙන්ම මකා දමයි (Refresh ලෙඩේ වැළැක්වීමට)
-        session.invalidate(); 
+        // 🚨 [FIX] පැරණි සෙෂන් එකක් තිබුණොත් එය සම්පූර්ණයෙන්ම මකා දමයි (Refresh ලෙඩේ වැළැක්වීමට)
+        HttpSession oldSession = request.getSession(false);
+        if (oldSession != null) {
+            oldSession.invalidate();
+        }
+
+        // 🎯 [TEST LOGIC] ඩේටාබේස් එක බයිපාස් කරලා බලෙන් ලොග් කරවන කොටස (ඩේටාබේස් ලෙඩක්ද කියා බැලීමට)
+        if ("test@gmail.com".equals(email) && "123".equals(password)) {
+            HttpSession newSession = request.getSession(true);
+            
+            newSession.setAttribute("userId", 999L);
+            newSession.setAttribute("userRole", "USER");
+            newSession.setAttribute("userName", "Test User");
+
+            return "redirect:/?loginSuccess=true";
+        }
 
         var user = userService.findByEmail(email);
 
         if (user.isPresent() && user.get().getPassword().equals(password)) {
             
-            // 🚨 [FIX] වීඩියෝ බැක්ග්‍රවුන්ඩ් එක නිසා සෙෂන් එක හිරවීම වැළැක්වීමට අලුත්ම පිරිසිදු සෙෂන් එකක් සාදා ගනී
-            session = jakarta.servlet.http.HttpServletRequest.class.cast(
-                org.springframework.web.context.request.RequestContextHolder.currentRequestAttributes()
-                .resolveReference(org.springframework.web.context.request.RequestAttributes.REFERENCE_REQUEST)
-            ).getSession(true);
+            // 🚨 [FIX] Linux සර්වර් වලදී සෙෂන් එක ආරක්ෂිතව තබා ගැනීමට Standard HttpServletRequest එක හරහා සෙෂන් එක සෑදීම
+            HttpSession newSession = request.getSession(true);
 
-            session.setAttribute("user", user.get());
-            session.setAttribute("userId", user.get().getId());
-            session.setAttribute("userRole", user.get().getRole());
-            session.setAttribute("userName", user.get().getName());
+            newSession.setAttribute("user", user.get());
+            newSession.setAttribute("userId", user.get().getId());
+            newSession.setAttribute("userRole", user.get().getRole());
+            newSession.setAttribute("userName", user.get().getName());
 
             if ("ADMIN".equals(user.get().getRole())) {
                 return "redirect:/admin";
             }
-            return "redirect:/?loginSuccess=true"; // 🎯 හෝම් පේජ් එකට සේෆ් පැරාමීටර් එකක් සමඟ රීඩිරෙක්ට් කරයි
+            return "redirect:/?loginSuccess=true"; 
         }
 
         model.addAttribute("error", "Invalid email or password");
-        return "login";
+        return "signin"; // 🎯 [FIX] වැරදුණු විට නැවත signin.html එකටම යැවීම
     }
 
     @GetMapping("/register")
@@ -111,9 +123,7 @@ public class AuthController {
             String resetLink = "http://localhost:8080/reset-password?token=" + token;
 
             try {
-                // ⚡ පරණ SimpleMailMessage එක වෙනුවට අපේ EmailService එකේ තියෙන HTML මෙතඩ් එක කෝල් කළා
                 emailService.sendForgotPasswordEmail(email, user.getName(), resetLink);
-
                 model.addAttribute("success", "Reset link has been sent to your email address successfully!");
             } catch (Exception e) {
                 model.addAttribute("error", "Failed to send email. Please check your SMTP settings.");
@@ -152,6 +162,6 @@ public class AuthController {
         userService.updatePassword(user, password);
 
         model.addAttribute("success", "Password reset successful! Please login with your new password.");
-        return "login";
+        return "signin"; // 🎯 [FIX] මුල් පිටුවට යාමට සකස් කිරීම
     }
 }
