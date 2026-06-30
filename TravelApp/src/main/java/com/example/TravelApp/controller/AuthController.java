@@ -1,7 +1,7 @@
 package com.example.TravelApp.controller;
 
 import com.example.TravelApp.model.User;
-import com.example.TravelApp.service.EmailService; // 🎯 EmailService එක Import කළා
+import com.example.TravelApp.service.EmailService; 
 import com.example.TravelApp.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final UserService userService;
-    private final EmailService emailService; // 🎯 JavaMailSender වෙනුවට අපේ EmailService එක Inject කරන්න Field එක හැදුවා
+    private final EmailService emailService; 
 
-    // Constructor එක හරහා අපේ EmailService එක ලස්සනට Inject කරගන්නවා
+    // Constructor Injection
     public AuthController(UserService userService, EmailService emailService) {
         this.userService = userService;
         this.emailService = emailService;
@@ -28,9 +28,20 @@ public class AuthController {
     @PostMapping("/login")
     public String loginSubmit(@RequestParam String email, @RequestParam String password,
                               HttpSession session, Model model) {
+        
+        // 🚨 [FIX] පැරණි සෙෂන් එකක් ඉතිරි වී ඇත්නම් එය සම්පූර්ණයෙන්ම මකා දමයි (Refresh ලෙඩේ වැළැක්වීමට)
+        session.invalidate(); 
+
         var user = userService.findByEmail(email);
 
         if (user.isPresent() && user.get().getPassword().equals(password)) {
+            
+            // 🚨 [FIX] වීඩියෝ බැක්ග්‍රවුන්ඩ් එක නිසා සෙෂන් එක හිරවීම වැළැක්වීමට අලුත්ම පිරිසිදු සෙෂන් එකක් සාදා ගනී
+            session = jakarta.servlet.http.HttpServletRequest.class.cast(
+                org.springframework.web.context.request.RequestContextHolder.currentRequestAttributes()
+                .resolveReference(org.springframework.web.context.request.RequestAttributes.REFERENCE_REQUEST)
+            ).getSession(true);
+
             session.setAttribute("user", user.get());
             session.setAttribute("userId", user.get().getId());
             session.setAttribute("userRole", user.get().getRole());
@@ -39,7 +50,7 @@ public class AuthController {
             if ("ADMIN".equals(user.get().getRole())) {
                 return "redirect:/admin";
             }
-            return "redirect:/";
+            return "redirect:/?loginSuccess=true"; // 🎯 හෝම් පේජ් එකට සේෆ් පැරාමීටර් එකක් සමඟ රීඩිරෙක්ට් කරයි
         }
 
         model.addAttribute("error", "Invalid email or password");
@@ -99,7 +110,6 @@ public class AuthController {
             // මුලින්ම Localhost ලින්ක් එක සාදාගන්නවා
             String resetLink = "http://localhost:8080/reset-password?token=" + token;
 
-            // 🚀 🎯 අපේ පට්ට ලස්සන Dark Mode HTML Theme එකෙන් ඊමේල් එක ෂූට් කරන කොටස:
             try {
                 // ⚡ පරණ SimpleMailMessage එක වෙනුවට අපේ EmailService එකේ තියෙන HTML මෙතඩ් එක කෝල් කළා
                 emailService.sendForgotPasswordEmail(email, user.getName(), resetLink);
