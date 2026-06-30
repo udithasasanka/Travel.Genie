@@ -9,7 +9,7 @@ import com.example.TravelApp.service.EmailService;
 import com.example.TravelApp.service.HotelService;
 import com.example.TravelApp.service.TourPackageService;
 import com.example.TravelApp.service.UserService;
-import com.example.TravelApp.service.PdfService; // 🎯 PDF Service එක Import කරගන්න
+import com.example.TravelApp.service.PdfService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.io.InputStreamResource;
@@ -34,9 +34,9 @@ public class BookingController {
     private final UserService userService;
     private final EmailService emailService;
     private final HotelService hotelService;
-    private final PdfService pdfService; // 🎯 1. මෙතන ක්ලාස් විචල්‍යය නිවැරදිව තියෙනවා මචං
+    private final PdfService pdfService;
 
-    // 🎯 2. Constructor එක ඇතුළට PdfService එක දමා Dependencies ඔක්කොම Inject කිරීම
+    // Constructor Injection
     public BookingController(BookingService bookingService, TourPackageService tourPackageService, 
                              UserService userService, EmailService emailService, 
                              HotelService hotelService, PdfService pdfService) {
@@ -48,7 +48,7 @@ public class BookingController {
         this.pdfService = pdfService; 
     }
 
-    // 🎯 පැකේජ් එකක් බුක් කරන මුල් පිටුව පෙන්වීම
+    // පැකේජ් එකක් බුක් කරන මුල් පිටුව පෙන්වීම
     @GetMapping({"/book/{packageId}", "/book/{packageId}/"})
     public String bookPackage(@PathVariable Long packageId, Model model) {
         TourPackage tourPackage = tourPackageService.findById(packageId).orElse(null);
@@ -60,7 +60,7 @@ public class BookingController {
         return "book-package";
     }
 
-    // 🎯 බුකින් එක Form එකෙන් සබ්මිට් කරද්දී මිල ගණන් හදලා සේව් කරන තැන
+    // බුකින් එක Form එකෙන් සබ්මිට් කරද්දී මිල ගණන් හදලා සේව් කරන තැන
     @PostMapping("/book")
     public String placeBooking(@ModelAttribute Booking booking,
                                @RequestParam Long packageId,
@@ -106,7 +106,7 @@ public class BookingController {
         int days = (hotelNights != null && hotelNights > 0) ? hotelNights : 1;
         double totalFoodCost = 0.0;
 
-        // 🍔 🧠 DAY-BY-DAY MEAL PRICE CALCULATION LOGIC (BACKEND LOOP)
+        // 🍔 🧠 DAY-BY-DAY MEAL PRICE CALCULATION LOGIC
         if (hotelId != null) {
             if ("hotel".equals(foodSource)) {
                 for (int i = 1; i <= days; i++) {
@@ -152,7 +152,7 @@ public class BookingController {
             }
         }
 
-        // 🧮 💸 අවසාන සුපිරි සූත්‍රය: 
+        // 🧮 💸 මිල ගණන් සෑදීමේ සූත්‍රය
         double extraHotelAndTransCost = (extraPricePerNight + transPrice) * booking.getTravelers() * days;
         double extraFoodCostTotal = totalFoodCost * booking.getTravelers();
         double totalPrice = (basePrice * booking.getTravelers()) + extraHotelAndTransCost + extraFoodCostTotal;
@@ -162,9 +162,15 @@ public class BookingController {
         // 💾 Booking එක Database එකට සේව් කිරීම
         bookingService.save(booking);
 
-        // 📧 Automated Success Email එක යැවීම
+        // 📧 🎯 AUTOMATED SUCCESS EMAIL LOGIC FIXED (පරාමිතීන් 3කට සකස් කිරීම)
         try {
-            emailService.sendBookingSuccessEmail(user.getEmail(), user.getName(), tourPackage.getName(), String.valueOf(totalPrice));
+            String emailSubject = "Booking Confirmation - " + tourPackage.getName();
+            String emailBody = "Dear " + user.getName() + ",\n\n" +
+                               "Your booking for " + tourPackage.getName() + " has been successfully placed.\n" +
+                               "Total Price: LKR " + totalPrice + "\n\n" +
+                               "Thank you for traveling with us!";
+                               
+            emailService.sendBookingSuccessEmail(user.getEmail(), emailSubject, emailBody);
         } catch (Exception e) {
             System.out.println("❌ Email Sending Bypassed: " + e.getMessage());
         }
@@ -178,7 +184,7 @@ public class BookingController {
         return "booking-confirmation";
     }
 
-    // 📄 🎯 INVOICE PDF DOWNLOAD ENDPOINT (අලුතින්ම එකතු කළ කොටස)
+    // 📄 🎯 INVOICE PDF DOWNLOAD ENDPOINT
     @GetMapping("/booking/download-receipt")
     public ResponseEntity<InputStreamResource> downloadReceipt(
             @RequestParam String email,
